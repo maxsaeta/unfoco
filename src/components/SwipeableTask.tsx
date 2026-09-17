@@ -8,7 +8,9 @@ import {
   Dimensions,
   TouchableOpacity,
   Modal,
-  Alert
+  Alert,
+  Platform,
+  ScrollView
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { COLORS, SPACING, FONTS, BORDER_RADIUS, TOUCH_TARGETS } from '../constants/theme';
@@ -20,12 +22,27 @@ interface SwipeableTaskProps {
   onSwipeRight: () => void;
   onDelete: () => void;
   onEdit: () => void;
+  onPrevious?: () => void;
+  onNext?: () => void;
+  canGoPrevious?: boolean;
+  canGoNext?: boolean;
 }
 
 const SCREEN_WIDTH = Dimensions.get('window').width;
 const SWIPE_THRESHOLD = 80;
+const isWeb = Platform.OS === 'web';
 
-export function SwipeableTask({ task, onSwipeLeft, onSwipeRight, onDelete, onEdit }: SwipeableTaskProps) {
+export function SwipeableTask({ 
+  task, 
+  onSwipeLeft, 
+  onSwipeRight, 
+  onDelete, 
+  onEdit,
+  onPrevious,
+  onNext,
+  canGoPrevious = false,
+  canGoNext = false
+}: SwipeableTaskProps) {
   const [translateX] = useState(new Animated.Value(0));
   const [showMenu, setShowMenu] = useState(false);
   const lastTap = useRef<number>(0);
@@ -37,6 +54,14 @@ export function SwipeableTask({ task, onSwipeLeft, onSwipeRight, onDelete, onEdi
 
   const currentStep = task.steps.find(step => !step.completed) || task.steps[task.steps.length - 1];
   const completedSteps = task.steps.filter(step => step.completed).length;
+
+  const handleWebPointerDown = () => {
+    const now = Date.now();
+    if (lastTap.current && (now - lastTap.current) < 300) {
+      setShowMenu(true);
+    }
+    lastTap.current = now;
+  };
 
   const handleDoubleTap = (): boolean => {
     const now = Date.now();
@@ -112,26 +137,16 @@ export function SwipeableTask({ task, onSwipeLeft, onSwipeRight, onDelete, onEdi
     callbacksRef.current.onEdit();
   };
 
-  return (
+  const taskContent = (
     <>
-      <Animated.View 
-        style={[
-          styles.container,
-          { 
-            transform: [{ translateX }],
-            opacity 
-          }
-        ]}
-        {...panResponder.panHandlers}
-        onStartShouldSetResponder={handleDoubleTap}
-      >
-        <View style={styles.taskHeader}>
-          <Text style={styles.taskTitle}>{task.title}</Text>
-          <Text style={styles.taskProgress}>
-            Paso {completedSteps + 1} de {task.steps.length}
-          </Text>
-        </View>
+      <View style={styles.taskHeader}>
+        <Text style={styles.taskTitle}>{task.title}</Text>
+        <Text style={styles.taskProgress}>
+          Paso {completedSteps + 1} de {task.steps.length}
+        </Text>
+      </View>
 
+      <ScrollView style={styles.stepScroll} nestedScrollEnabled={true}>
         <View style={styles.stepCard}>
           <View style={styles.stepIndicator}>
             <Text style={styles.stepNumber}>{completedSteps + 1}</Text>
@@ -143,26 +158,86 @@ export function SwipeableTask({ task, onSwipeLeft, onSwipeRight, onDelete, onEdi
             ) : null}
           </View>
         </View>
+      </ScrollView>
 
-        <View style={styles.progressBar}>
-          {task.steps.map((step, index) => (
-            <View 
-              key={index}
-              style={[
-                styles.progressDot,
-                step.completed && styles.progressDotCompleted,
-                !step.completed && index === completedSteps && styles.progressDotActive,
-              ]} 
+      <View style={styles.progressBar}>
+        {task.steps.map((step, index) => (
+          <View 
+            key={index}
+            style={[
+              styles.progressDot,
+              step.completed && styles.progressDotCompleted,
+              !step.completed && index === completedSteps && styles.progressDotActive,
+            ]} 
+          />
+        ))}
+      </View>
+
+      <View style={styles.swipeIndicator}>
+        <Ionicons name="chevron-back" size={16} color={COLORS.textMuted} />
+        <Text style={styles.swipeText}>Doble clic para opciones</Text>
+        <Ionicons name="chevron-forward" size={16} color={COLORS.textMuted} />
+      </View>
+    </>
+  );
+
+  return (
+    <>
+      <View style={styles.containerWithArrows}>
+        {/* Left Arrow - Navigation */}
+        {isWeb && (
+          <TouchableOpacity 
+            style={[styles.navArrow, styles.navArrowLeft, !canGoPrevious && styles.navArrowDisabled]}
+            onPress={onPrevious}
+            disabled={!canGoPrevious}
+          >
+            <Ionicons 
+              name="chevron-back-circle" 
+              size={40} 
+              color={canGoPrevious ? COLORS.accent : COLORS.textMuted} 
             />
-          ))}
-        </View>
+          </TouchableOpacity>
+        )}
 
-        <View style={styles.swipeIndicator}>
-          <Ionicons name="chevron-back" size={16} color={COLORS.textMuted} />
-          <Text style={styles.swipeText}>Doble clic para opciones</Text>
-          <Ionicons name="chevron-forward" size={16} color={COLORS.textMuted} />
-        </View>
-      </Animated.View>
+        {/* Task Card */}
+        <Animated.View 
+          style={[
+            styles.taskContainer,
+            { 
+              transform: [{ translateX }],
+              opacity 
+            }
+          ]}
+          {...(!isWeb ? panResponder.panHandlers : {})}
+          onStartShouldSetResponder={!isWeb ? handleDoubleTap : undefined}
+        >
+        {isWeb ? (
+          <TouchableOpacity 
+            activeOpacity={1}
+            onPress={handleWebPointerDown}
+          >
+            {taskContent}
+          </TouchableOpacity>
+        ) : (
+          taskContent
+        )}
+        </Animated.View>
+
+        {/* Right Arrow - Navigation */}
+        {isWeb && (
+          <TouchableOpacity 
+            style={[styles.navArrow, styles.navArrowRight, !canGoNext && styles.navArrowDisabled]}
+            onPress={onNext}
+            disabled={!canGoNext}
+          >
+            <Ionicons 
+              name="chevron-forward-circle" 
+              size={40} 
+              color={canGoNext ? COLORS.accent : COLORS.textMuted} 
+            />
+          </TouchableOpacity>
+        )}
+      </View>
 
       {/* Menú de opciones */}
       <Modal visible={showMenu} transparent animationType="fade">
@@ -198,8 +273,29 @@ export function SwipeableTask({ task, onSwipeLeft, onSwipeRight, onDelete, onEdi
 }
 
 const styles = StyleSheet.create({
-  container: {
-    paddingHorizontal: SPACING.lg,
+  containerWithArrows: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: isWeb ? SPACING.md : SPACING.lg,
+  },
+  navArrow: {
+    padding: SPACING.sm,
+    minWidth: TOUCH_TARGETS.minSize,
+    minHeight: TOUCH_TARGETS.minSize,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  navArrowLeft: {
+    marginRight: SPACING.sm,
+  },
+  navArrowRight: {
+    marginLeft: SPACING.sm,
+  },
+  navArrowDisabled: {
+    opacity: 0.3,
+  },
+  taskContainer: {
+    flex: 1,
     gap: SPACING.md,
   },
   taskHeader: {
@@ -215,6 +311,9 @@ const styles = StyleSheet.create({
   taskProgress: {
     color: COLORS.textSecondary,
     fontSize: FONTS.size.small,
+  },
+  stepScroll: {
+    maxHeight: 200,
   },
   stepCard: {
     flexDirection: 'row',

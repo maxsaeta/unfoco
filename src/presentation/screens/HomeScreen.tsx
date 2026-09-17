@@ -5,7 +5,9 @@ import {
   StyleSheet, 
   Alert, 
   TouchableOpacity,
-  ActivityIndicator
+  ActivityIndicator,
+  ScrollView,
+  Platform
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
@@ -24,6 +26,8 @@ import { useHomeViewModel } from './HomeViewModel';
 import { registerForPushNotifications } from '../../services/notificationService';
 import { container } from '../../di/container';
 import { auth } from '../../config/firebase';
+
+const isWeb = Platform.OS === 'web';
 
 export function HomeScreen() {
   const {
@@ -133,7 +137,11 @@ export function HomeScreen() {
 
   return (
     <SafeAreaView style={styles.container} edges={['top', 'left', 'right']}>
-      <View style={styles.content}>
+      <ScrollView 
+        style={styles.scrollContainer}
+        contentContainerStyle={styles.scrollContent}
+        showsVerticalScrollIndicator={false}
+      >
         {/* Header */}
         <View style={styles.header}>
           <View style={styles.logo}>
@@ -215,6 +223,10 @@ export function HomeScreen() {
                 onSwipeRight={handleSwipeRight}
                 onDelete={() => handleDeleteTask(currentTask.id!)}
                 onEdit={() => onEditTask(currentTask)}
+                onPrevious={handleSwipeRight}
+                onNext={handleSwipeLeft}
+                canGoPrevious={state.currentTaskIndex > 0}
+                canGoNext={state.currentTaskIndex < activeTasks.length - 1}
               />
             ) : (
               <View style={styles.emptyState}>
@@ -323,7 +335,7 @@ export function HomeScreen() {
             </View>
           </>
         )}
-      </View>
+      </ScrollView>
 
       {/* Modal Agregar Tarea */}
       <AddTaskModal
@@ -381,6 +393,13 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: COLORS.background,
+  },
+  scrollContainer: {
+    flex: 1,
+  },
+  scrollContent: {
+    flexGrow: 1,
+    paddingVertical: SPACING.md,
   },
   loading: {
     flex: 1,
