@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UnPaso - Diseño de Pantalla Principal</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #0a0a0a;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .phone-frame {
+            width: 375px;
+            height: 812px;
+            background: linear-gradient(180deg, #1a1a2e 0%, #16213e 100%);
+            border-radius: 40px;
+            overflow: hidden;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            position: relative;
+            border: 3px solid #333;
+        }
+
+        .status-bar {
+            height: 44px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 24px;
+            color: white;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .content {
+            padding: 20px 24px;
+            display: flex;
+            flex-direction: column;
+            height: calc(100% - 44px);
+        }
+
+        /* Logo */
+        .logo-section {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 30px;
+        }
+
+        .logo {
+            width: 48px;
+            height: 48px;
+            background: #0f3460;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .logo-dot {
+            width: 16px;
+            height: 16px;
+            background: #e94560;
+            border-radius: 50%;
+        }
+
+        /* Timer */
+        .timer-section {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .timer-label {
+            color: #a0a0a0;
+            font-size: 12px;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            margin-bottom: 8px;
+        }
+
+        .timer-value {
+            color: #ffffff;
+            font-size: 72px;
+            font-weight: 200;
+            letter-spacing: 4px;
+        }
+
+        .timer-hint {
+            color: #606060;
+            font-size: 13px;
+            margin-top: 8px;
+        }
+
+        /* Task Card */
+        .task-card {
+            background: #16213e;
+            border-radius: 20px;
+            padding: 32px;
+            border: 2px solid #e94560;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        .task-label {
+            color: #a0a0a0;
+            font-size: 11px;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            margin-bottom: 16px;
+        }
+
+        .task-title {
+            color: #ffffff;
+            font-size: 28px;
+            font-weight: bold;
+            text-align: center;
+            line-height: 1.3;
+            margin-bottom: 12px;
+        }
+
+        .task-subtitle {
+            color: #a0a0a0;
+            font-size: 16px;
+            text-align: center;
+        }
+
+        /* Buttons */
+        .buttons-section {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .btn-primary {
+            background: #e94560;
+            color: white;
+            border: none;
+            padding: 18px 32px;
+            border-radius: 50px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            text-align: center;
+            letter-spacing: 1px;
+        }
+
+        .btn-secondary-row {
+            display: flex;
+            gap: 12px;
+        }
+
+        .btn-secondary {
+            flex: 1;
+            background: transparent;
+            color: #a0a0a0;
+            border: 2px solid #a0a0a0;
+            padding: 14px 20px;
+            border-radius: 50px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            text-align: center;
+        }
+
+        /* Footer */
+        .footer {
+            display: flex;
+            justify-content: center;
+            padding: 20px 0;
+        }
+
+        .task-dots {
+            display: flex;
+            gap: 8px;
+        }
+
+        .dot {
+            width: 8px;
+            height: 8px;
+            background: #606060;
+            border-radius: 50%;
+        }
+
+        .dot.active {
+            width: 24px;
+            background: #e94560;
+        }
+
+        .dot.completed {
+            background: #4ade80;
+        }
+
+        /* Info Panel */
+        .info-panel {
+            position: fixed;
+            right: 40px;
+            background: #1a1a2e;
+            border: 1px solid #333;
+            border-radius: 12px;
+            padding: 24px;
+            max-width: 320px;
+            color: white;
+        }
+
+        .info-panel h3 {
+            color: #e94560;
+            margin-bottom: 16px;
+            font-size: 18px;
+        }
+
+        .info-panel p {
+            color: #a0a0a0;
+            font-size: 14px;
+            line-height: 1.6;
+            margin-bottom: 12px;
+        }
+
+        .info-panel .feature {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+
+        .info-panel .feature-icon {
+            width: 32px;
+            height: 32px;
+            background: #0f3460;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+        }
+
+        .info-panel .feature-text {
+            color: #ffffff;
+            font-size: 14px;
+        }
+
+        @media (max-width: 900px) {
+            .info-panel {
+                position: static;
+                margin-top: 30px;
+                max-width: 375px;
+            }
+            
+            body {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="phone-frame">
+        <div class="status-bar">
+            <span>9:41</span>
+            <span>●●●</span>
+        </div>
+        <div class="content">
+            <!-- Logo -->
+            <div class="logo-section">
+                <div class="logo">
+                    <div class="logo-dot"></div>
+                </div>
+            </div>
+
+            <!-- Timer -->
+            <div class="timer-section">
+                <div class="timer-label">TIEMPO</div>
+                <div class="timer-value">25:00</div>
+                <div class="timer-hint">Presiona para comenzar</div>
+            </div>
+
+            <!-- Task Card -->
+            <div class="task-card">
+                <div class="task-label">TU TAREA AHORA</div>
+                <div class="task-title">Organizar el garaje</div>
+                <div class="task-subtitle">Buscar 3 cajas viejas</div>
+            </div>
+
+            <!-- Buttons -->
+            <div class="buttons-section">
+                <button class="btn-primary">EMPEZAR</button>
+                <div class="btn-secondary-row">
+                    <button class="btn-secondary">Completada ✓</button>
+                    <button class="btn-secondary">Saltar →</button>
+                </div>
+            </div>
+
+            <!-- Footer -->
+            <div class="footer">
+                <div class="task-dots">
+                    <div class="dot active"></div>
+                    <div class="dot"></div>
+                    <div class="dot"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="info-panel">
+        <h3>UnPaso - Diseño MVP</h3>
+        <p>Pantalla principal de la app de productividad para TDAH.</p>
+        
+        <div class="feature">
+            <div class="feature-icon">🎯</div>
+            <div class="feature-text"><strong>Enfoque Único:</strong> Una tarea a la vez, sin distracciones</div>
+        </div>
+        
+        <div class="feature">
+            <div class="feature-icon">⏱️</div>
+            <div class="feature-text"><strong>Timer Pomodoro:</strong> 25 min trabajo, 5 min descanso</div>
+        </div>
+        
+        <div class="feature">
+            <div class="feature-icon">✨</div>
+            <div class="feature-text"><strong>Desglose:</strong> Tarea grande → micro-pasos de 5 min</div>
+        </div>
+        
+        <div class="feature">
+            <div class="feature-icon">📊</div>
+            <div class="feature-text"><strong>Progreso:</strong> Seguimiento visual de tareas completadas</div>
+        </div>
+    </div>
+</body>
+</html>
