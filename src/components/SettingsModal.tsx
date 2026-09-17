@@ -107,6 +107,14 @@ export function SettingsModal({ visible, onClose, onSave }: SettingsModalProps) 
               </View>
             </View>
 
+            {/* Preview */}
+            <View style={styles.preview}>
+              <Ionicons name="time-outline" size={16} color={colors.textSecondary} />
+              <Text style={styles.previewText}>
+                {workMinutes} min trabajo + {breakMinutes} min descanso
+              </Text>
+            </View>
+
             {/* Theme Mode */}
             <View style={styles.section}>
               <Text style={styles.sectionTitle}>Apariencia</Text>
@@ -138,14 +146,6 @@ export function SettingsModal({ visible, onClose, onSave }: SettingsModalProps) 
                   </TouchableOpacity>
                 ))}
               </View>
-            </View>
-
-            {/* Preview */}
-            <View style={styles.preview}>
-              <Ionicons name="time-outline" size={16} color={colors.textSecondary} />
-              <Text style={styles.previewText}>
-                {workMinutes} min trabajo + {breakMinutes} min descanso
-              </Text>
             </View>
           </ScrollView>
 
