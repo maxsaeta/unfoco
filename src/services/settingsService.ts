@@ -1,11 +1,10 @@
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import { doc, getDoc, setDoc } from 'firebase/firestore';
+import { db, auth } from '../config/firebase';
 
 export interface TimerSettings {
   workMinutes: number;
   breakMinutes: number;
 }
-
-const STORAGE_KEY = '@unpaso_timer_settings';
 
 const DEFAULT_SETTINGS: TimerSettings = {
   workMinutes: 25,
@@ -14,8 +13,16 @@ const DEFAULT_SETTINGS: TimerSettings = {
 
 export const getTimerSettings = async (): Promise<TimerSettings> => {
   try {
-    const jsonValue = await AsyncStorage.getItem(STORAGE_KEY);
-    return jsonValue ? JSON.parse(jsonValue) : DEFAULT_SETTINGS;
+    const userId = auth.currentUser?.uid;
+    if (!userId) return DEFAULT_SETTINGS;
+
+    const docRef = doc(db, 'users', userId);
+    const docSnap = await getDoc(docRef);
+
+    if (docSnap.exists() && docSnap.data().timerSettings) {
+      return docSnap.data().timerSettings as TimerSettings;
+    }
+    return DEFAULT_SETTINGS;
   } catch (error) {
     console.error('Error loading timer settings:', error);
     return DEFAULT_SETTINGS;
@@ -24,8 +31,11 @@ export const getTimerSettings = async (): Promise<TimerSettings> => {
 
 export const saveTimerSettings = async (settings: TimerSettings): Promise<void> => {
   try {
-    const jsonValue = JSON.stringify(settings);
-    await AsyncStorage.setItem(STORAGE_KEY, jsonValue);
+    const userId = auth.currentUser?.uid;
+    if (!userId) return;
+
+    const docRef = doc(db, 'users', userId);
+    await setDoc(docRef, { timerSettings: settings }, { merge: true });
   } catch (error) {
     console.error('Error saving timer settings:', error);
   }
