@@ -1,6 +1,7 @@
 import React from 'react';
 import { StatusBar } from 'expo-status-bar';
 import { View, ActivityIndicator, StyleSheet } from 'react-native';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { HomeScreen } from './src/presentation/screens/HomeScreen';
 import { LoginScreen } from './src/presentation/screens/LoginScreen';
 import { useAuth } from './src/hooks/useAuth';
@@ -11,26 +12,28 @@ export default function App() {
 
   if (loading) {
     return (
-      <View style={styles.loading}>
-        <ActivityIndicator size="large" color={COLORS.accent} />
-      </View>
+      <SafeAreaProvider>
+        <View style={styles.loading}>
+          <ActivityIndicator size="large" color={COLORS.accent} />
+        </View>
+      </SafeAreaProvider>
     );
   }
 
   if (!user) {
     return (
-      <>
+      <SafeAreaProvider>
         <StatusBar style="light" />
         <LoginScreen />
-      </>
+      </SafeAreaProvider>
     );
   }
 
   return (
-    <>
+    <SafeAreaProvider>
       <StatusBar style="light" />
       <HomeScreen />
-    </>
+    </SafeAreaProvider>
   );
 }
 
