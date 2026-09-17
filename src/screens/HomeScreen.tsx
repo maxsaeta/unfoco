@@ -28,6 +28,7 @@ import {
 } from '../services/taskService';
 import { logout } from '../services/authService';
 import { getTimerSettings, TimerSettings } from '../services/settingsService';
+import { registerForPushNotifications } from '../services/notificationService';
 import { auth } from '../config/firebase';
 
 export function HomeScreen() {
@@ -68,6 +69,7 @@ export function HomeScreen() {
 
   useEffect(() => {
     loadSettings();
+    registerForPushNotifications();
     const userId = auth.currentUser?.uid;
     if (!userId) return;
 

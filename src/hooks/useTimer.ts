@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { Vibration, Platform } from 'react-native';
+import { scheduleTimerNotification, cancelAllNotifications } from '../services/notificationService';
 
 export type TimerMode = 'work' | 'break';
 
@@ -21,6 +22,7 @@ export function useTimer({
   const [seconds, setSeconds] = useState(0);
   const [isRunning, setIsRunning] = useState(false);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const notificationIdRef = useRef<string | null>(null);
 
   const workCompleteRef = useRef(onWorkComplete);
   const breakCompleteRef = useRef(onBreakComplete);
@@ -72,32 +74,66 @@ export function useTimer({
     };
   }, [isRunning, mode, workMinutes, breakMinutes]);
 
-  const start = () => setIsRunning(true);
-  const pause = () => setIsRunning(false);
+  const start = useCallback(async () => {
+    setIsRunning(true);
+    // Schedule notification for when timer completes
+    const totalSeconds = mode === 'work' 
+      ? (minutes * 60 + seconds)
+      : (minutes * 60 + seconds);
+    
+    if (totalSeconds > 0) {
+      try {
+        await cancelAllNotifications();
+        const title = mode === 'work' ? '🍅 Pomodoro completado' : '☕ Descanso terminado';
+        const body = mode === 'work' 
+          ? '¡Hora de descansar! Tómate un respiro.' 
+          : '¡Listo para otro Pomodoro?';
+        notificationIdRef.current = await scheduleTimerNotification(totalSeconds, title, body);
+      } catch (error) {
+        console.error('Error scheduling notification:', error);
+      }
+    }
+  }, [mode, minutes, seconds]);
 
-  const reset = useCallback(() => {
+  const pause = useCallback(async () => {
+    setIsRunning(false);
+    if (notificationIdRef.current) {
+      await cancelAllNotifications();
+      notificationIdRef.current = null;
+    }
+  }, []);
+
+  const reset = useCallback(async () => {
     setIsRunning(false);
     setMode('work');
     setMinutes(workMinutes);
     setSeconds(0);
+    if (notificationIdRef.current) {
+      await cancelAllNotifications();
+      notificationIdRef.current = null;
+    }
   }, [workMinutes]);
 
-  const skipBreak = useCallback(() => {
+  const skipBreak = useCallback(async () => {
     if (mode === 'break') {
       setIsRunning(false);
       setMode('work');
       setMinutes(workMinutes);
       setSeconds(0);
+      if (notificationIdRef.current) {
+        await cancelAllNotifications();
+        notificationIdRef.current = null;
+      }
     }
   }, [mode, workMinutes]);
 
-  const toggle = () => {
+  const toggle = useCallback(() => {
     if (isRunning) {
       pause();
     } else {
       start();
     }
-  };
+  }, [isRunning, start, pause]);
 
   return {
     mode,
