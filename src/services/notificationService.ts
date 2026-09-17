@@ -1,100 +1,128 @@
 import * as Notifications from 'expo-notifications';
-import * as Device from 'expo-device';
 import { Platform } from 'react-native';
-import { doc, setDoc } from 'firebase/firestore';
-import { db, auth } from '../config/firebase';
 
-Notifications.setNotificationHandler({
-  handleNotification: async () => ({
-    shouldShowAlert: true,
-    shouldPlaySound: true,
-    shouldSetBadge: false,
-    shouldShowBanner: true,
-    shouldShowList: true,
-  }),
-});
+let pushNotificationsAvailable = true;
+
+try {
+  Notifications.setNotificationHandler({
+    handleNotification: async () => ({
+      shouldShowAlert: true,
+      shouldPlaySound: true,
+      shouldSetBadge: false,
+      shouldShowBanner: true,
+      shouldShowList: true,
+    }),
+  });
+} catch (error) {
+  console.log('Notifications not available in this environment');
+  pushNotificationsAvailable = false;
+}
+
+export const isPushNotificationsAvailable = (): boolean => {
+  return pushNotificationsAvailable;
+};
 
 export const registerForPushNotifications = async (): Promise<string | null> => {
-  if (!Device.isDevice) {
-    console.log('Push notifications require a physical device');
+  if (!pushNotificationsAvailable) {
+    console.log('Push notifications not available in Expo Go SDK 57+');
     return null;
   }
 
-  const { status: existingStatus } = await Notifications.getPermissionsAsync();
-  let finalStatus = existingStatus;
+  try {
+    const { status: existingStatus } = await Notifications.getPermissionsAsync();
+    let finalStatus = existingStatus;
 
-  if (existingStatus !== 'granted') {
-    const { status } = await Notifications.requestPermissionsAsync();
-    finalStatus = status;
-  }
-
-  if (finalStatus !== 'granted') {
-    console.log('Push notification permission not granted');
-    return null;
-  }
-
-  const token = await Notifications.getExpoPushTokenAsync();
-  console.log('Expo Push Token:', token.data);
-
-  // Save token to Firestore
-  const userId = auth.currentUser?.uid;
-  if (userId) {
-    try {
-      const userRef = doc(db, 'users', userId);
-      await setDoc(userRef, { pushToken: token.data }, { merge: true });
-    } catch (error) {
-      console.error('Error saving push token:', error);
+    if (existingStatus !== 'granted') {
+      const { status } = await Notifications.requestPermissionsAsync();
+      finalStatus = status;
     }
-  }
 
-  if (Platform.OS === 'android') {
-    Notifications.setNotificationChannelAsync('timer', {
-      name: 'Timer Notifications',
-      importance: Notifications.AndroidImportance.HIGH,
-      vibrationPattern: [0, 250, 250, 250],
-      lightColor: '#e94560',
-    });
-  }
+    if (finalStatus !== 'granted') {
+      console.log('Push notification permission not granted');
+      return null;
+    }
 
-  return token.data;
+    // Skip push token in Expo Go (not supported in SDK 57+)
+    console.log('Push notifications configured (local only in Expo Go)');
+    return null;
+  } catch (error) {
+    console.log('Push notifications not available:', error);
+    return null;
+  }
 };
 
 export const scheduleTimerNotification = async (
   seconds: number,
   title: string,
   body: string
-): Promise<string> => {
-  const id = await Notifications.scheduleNotificationAsync({
-    content: {
-      title,
-      body,
-      sound: true,
-      priority: Notifications.AndroidNotificationPriority.HIGH,
-    },
-    trigger: {
-      type: Notifications.SchedulableTriggerInputTypes.TIME_INTERVAL,
-      seconds,
-    },
-  });
-  return id;
+): Promise<string | null> => {
+  if (!pushNotificationsAvailable) {
+    console.log('Local notifications not available');
+    return null;
+  }
+
+  try {
+    const id = await Notifications.scheduleNotificationAsync({
+      content: {
+        title,
+        body,
+        sound: true,
+        priority: Notifications.AndroidNotificationPriority.HIGH,
+      },
+      trigger: {
+        type: Notifications.SchedulableTriggerInputTypes.TIME_INTERVAL,
+        seconds,
+      },
+    });
+    return id;
+  } catch (error) {
+    console.log('Error scheduling notification:', error);
+    return null;
+  }
 };
 
 export const cancelNotification = async (notificationId: string): Promise<void> => {
-  await Notifications.cancelScheduledNotificationAsync(notificationId);
+  if (!pushNotificationsAvailable) return;
+
+  try {
+    await Notifications.cancelScheduledNotificationAsync(notificationId);
+  } catch (error) {
+    console.log('Error canceling notification:', error);
+  }
 };
 
 export const cancelAllNotifications = async (): Promise<void> => {
-  await Notifications.cancelAllScheduledNotificationsAsync();
+  if (!pushNotificationsAvailable) return;
+
+  try {
+    await Notifications.cancelAllScheduledNotificationsAsync();
+  } catch (error) {
+    console.log('Error canceling notifications:', error);
+  }
 };
 
 export const addNotificationListener = (
   handler: (notification: Notifications.Notification) => void
 ) => {
-  return Notifications.addNotificationReceivedListener(handler);
+  if (!pushNotificationsAvailable) return { remove: () => {} };
+
+  try {
+    return Notifications.addNotificationReceivedListener(handler);
+  } catch (error) {
+    console.log('Error adding notification listener:', error);
+    return { remove: () => {} };
+  }
 };
 
 export const addNotificationResponseListener = (
   handler: (response: Notifications.NotificationResponse) => void
 ) => {
-  return Notifications.addNotificationResponseReceivedListener(handler);
+  if (!pushNotificationsAvailable) return { remove: () => {} };
+
+  try {
+    return Notifications.addNotificationResponseReceivedListener(handler);
+  } catch (error) {
+    console.log('Error adding notification response listener:', error);
+    return { remove: () => {} };
+  }
 };
