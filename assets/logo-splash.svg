@@ -1,0 +1,75 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" width="1024" height="1024">
+  <defs>
+    <linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#00BCD4;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#0097A7;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="grad2" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#00BCD4;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#00E5FF;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Background -->
+  <rect width="1024" height="1024" fill="#1a1a2e"/>
+  
+  <!-- Logo icon (smaller, centered) -->
+  <g transform="translate(512, 380) scale(0.6)">
+    <!-- Outer ring -->
+    <circle cx="0" cy="0" r="280" fill="none" stroke="url(#grad1)" stroke-width="12" stroke-linecap="round" stroke-dasharray="200 50 100 50"/>
+    
+    <!-- Inner circle -->
+    <circle cx="0" cy="0" r="220" fill="none" stroke="#00BCD4" stroke-width="4" opacity="0.3"/>
+    
+    <!-- U shape -->
+    <path d="M -140 -80 
+             L -140 120 
+             Q -140 240 -20 240 
+             L 124 240 
+             Q 244 240 244 120 
+             L 244 -80" 
+          fill="none" 
+          stroke="url(#grad2)" 
+          stroke-width="48" 
+          stroke-linecap="round"
+          stroke-linejoin="round"/>
+    
+    <!-- Arrow -->
+    <path d="M 260 80 
+             L 360 80 
+             L 360 40 
+             L 440 100 
+             L 360 160 
+             L 360 120 
+             L 260 120" 
+          fill="#00E5FF" 
+          stroke="none"/>
+    
+    <!-- Check -->
+    <path d="M -20 40 
+             L 40 100 
+             L 160 -40" 
+          fill="none" 
+          stroke="#FFFFFF" 
+          stroke-width="32" 
+          stroke-linecap="round"
+          stroke-linejoin="round"/>
+  </g>
+  
+  <!-- App name text -->
+  <text x="512" y="680" 
+        font-family="Arial, Helvetica, sans-serif" 
+        font-size="96" 
+        font-weight="bold" 
+        fill="#FFFFFF" 
+        text-anchor="middle" 
+        letter-spacing="8">UNPASO</text>
+  
+  <!-- Tagline -->
+  <text x="512" y="760" 
+        font-family="Arial, Helvetica, sans-serif" 
+        font-size="32" 
+        fill="#00BCD4" 
+        text-anchor="middle" 
+        letter-spacing="4">UNA TAREA A LA VEZ</text>
+</svg>
