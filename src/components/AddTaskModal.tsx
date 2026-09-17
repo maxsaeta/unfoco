@@ -13,7 +13,7 @@ import {
   ActivityIndicator
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { COLORS, SPACING, FONTS } from '../constants/theme';
+import { COLORS, SPACING, FONTS, BORDER_RADIUS, TOUCH_TARGETS } from '../constants/theme';
 import { generateTaskSteps, TaskStep } from '../services/aiService';
 
 interface AddTaskModalProps {
@@ -217,7 +217,7 @@ const styles = StyleSheet.create({
   },
   modal: {
     backgroundColor: COLORS.surface,
-    borderRadius: 20,
+    borderRadius: BORDER_RADIUS.xl,
     padding: SPACING.lg,
     maxHeight: '85%',
   },
@@ -229,18 +229,19 @@ const styles = StyleSheet.create({
   },
   modalTitle: {
     color: COLORS.textPrimary,
-    fontSize: FONTS.size.large,
-    fontWeight: 'bold',
+    fontSize: FONTS.size.xlarge,
+    fontWeight: FONTS.weight.bold,
   },
   input: {
     backgroundColor: COLORS.background,
-    borderRadius: 12,
+    borderRadius: BORDER_RADIUS.md,
     padding: SPACING.md,
     color: COLORS.textPrimary,
     fontSize: FONTS.size.medium,
     marginBottom: SPACING.md,
     borderWidth: 1,
-    borderColor: COLORS.primary,
+    borderColor: COLORS.border,
+    minHeight: TOUCH_TARGETS.minSize,
   },
   aiButton: {
     flexDirection: 'row',
@@ -249,19 +250,20 @@ const styles = StyleSheet.create({
     gap: SPACING.sm,
     paddingVertical: SPACING.md,
     paddingHorizontal: SPACING.lg,
-    borderRadius: 12,
+    borderRadius: BORDER_RADIUS.md,
     borderWidth: 1,
     borderColor: COLORS.accent,
     backgroundColor: 'transparent',
     marginBottom: SPACING.md,
+    minHeight: TOUCH_TARGETS.minSize,
   },
   aiButtonDisabled: {
     opacity: 0.6,
   },
   aiButtonText: {
     color: COLORS.accent,
-    fontSize: FONTS.size.small,
-    fontWeight: '600',
+    fontSize: FONTS.size.medium,
+    fontWeight: FONTS.weight.semibold,
   },
   aiStepsContainer: {
     marginBottom: SPACING.md,
@@ -278,10 +280,11 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     padding: SPACING.md,
-    borderRadius: 12,
+    borderRadius: BORDER_RADIUS.md,
     backgroundColor: COLORS.background,
     marginBottom: SPACING.sm,
     gap: SPACING.md,
+    minHeight: TOUCH_TARGETS.minSize,
   },
   aiStepItemSelected: {
     borderWidth: 1,
@@ -290,7 +293,7 @@ const styles = StyleSheet.create({
   checkbox: {
     width: 24,
     height: 24,
-    borderRadius: 6,
+    borderRadius: BORDER_RADIUS.sm,
     borderWidth: 2,
     borderColor: COLORS.textSecondary,
     alignItems: 'center',
@@ -305,13 +308,13 @@ const styles = StyleSheet.create({
   },
   aiStepTitle: {
     color: COLORS.textPrimary,
-    fontSize: FONTS.size.small,
-    fontWeight: '600',
+    fontSize: FONTS.size.medium,
+    fontWeight: FONTS.weight.semibold,
     marginBottom: 2,
   },
   aiStepDescription: {
     color: COLORS.textSecondary,
-    fontSize: 12,
+    fontSize: FONTS.size.xs,
   },
   manualStepContainer: {
     marginBottom: SPACING.md,
@@ -329,24 +332,26 @@ const styles = StyleSheet.create({
   buttonCancel: {
     flex: 1,
     paddingVertical: SPACING.md,
-    borderRadius: 12,
+    borderRadius: BORDER_RADIUS.md,
     alignItems: 'center',
     backgroundColor: COLORS.background,
+    minHeight: TOUCH_TARGETS.minSize,
   },
   buttonCancelText: {
     color: COLORS.textSecondary,
     fontSize: FONTS.size.medium,
-    fontWeight: '600',
+    fontWeight: FONTS.weight.semibold,
   },
   buttonAdd: {
     flex: 1,
     flexDirection: 'row',
     paddingVertical: SPACING.md,
-    borderRadius: 12,
+    borderRadius: BORDER_RADIUS.md,
     alignItems: 'center',
     justifyContent: 'center',
     gap: SPACING.sm,
     backgroundColor: COLORS.accent,
+    minHeight: TOUCH_TARGETS.minSize,
   },
   buttonAddDisabled: {
     opacity: 0.5,
@@ -354,6 +359,6 @@ const styles = StyleSheet.create({
   buttonAddText: {
     color: COLORS.textPrimary,
     fontSize: FONTS.size.medium,
-    fontWeight: '600',
+    fontWeight: FONTS.weight.semibold,
   },
 });

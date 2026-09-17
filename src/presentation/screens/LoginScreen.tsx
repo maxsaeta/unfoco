@@ -12,7 +12,7 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
-import { COLORS, SPACING, FONTS } from '../../constants/theme';
+import { COLORS, SPACING, FONTS, BORDER_RADIUS, TOUCH_TARGETS } from '../../constants/theme';
 import { useLoginViewModel } from './LoginViewModel';
 
 export function LoginScreen() {
@@ -103,65 +103,71 @@ const styles = StyleSheet.create({
   },
   logoContainer: {
     alignItems: 'center',
-    marginBottom: SPACING.xxl,
+    marginBottom: SPACING.xxxl,
   },
   logo: {
-    width: 80,
-    height: 80,
-    borderRadius: 40,
+    width: 96,
+    height: 96,
+    borderRadius: 48,
     backgroundColor: COLORS.primary,
     alignItems: 'center',
     justifyContent: 'center',
-    marginBottom: SPACING.md,
+    marginBottom: SPACING.lg,
   },
   logoDot: {
-    width: 28,
-    height: 28,
-    borderRadius: 14,
+    width: 32,
+    height: 32,
+    borderRadius: 16,
     backgroundColor: COLORS.accent,
   },
   appName: {
     color: COLORS.textPrimary,
-    fontSize: FONTS.size.xlarge,
-    fontWeight: 'bold',
-    marginBottom: SPACING.xs,
+    fontSize: FONTS.size.xxxlarge,
+    fontWeight: FONTS.weight.bold,
+    marginBottom: SPACING.sm,
   },
   tagline: {
     color: COLORS.textSecondary,
-    fontSize: FONTS.size.medium,
+    fontSize: FONTS.size.large,
   },
   form: {
-    gap: SPACING.md,
+    gap: SPACING.lg,
   },
   input: {
     backgroundColor: COLORS.surface,
-    borderRadius: 12,
-    padding: SPACING.md,
+    borderRadius: BORDER_RADIUS.md,
+    padding: SPACING.lg,
     color: COLORS.textPrimary,
-    fontSize: FONTS.size.medium,
+    fontSize: FONTS.size.large,
+    minHeight: TOUCH_TARGETS.recommendedSize,
+    borderWidth: 1,
+    borderColor: COLORS.border,
   },
   error: {
     color: COLORS.error,
-    fontSize: FONTS.size.small,
+    fontSize: FONTS.size.medium,
     textAlign: 'center',
+    padding: SPACING.sm,
   },
   submitButton: {
     backgroundColor: COLORS.accent,
-    borderRadius: 12,
-    padding: SPACING.md,
+    borderRadius: BORDER_RADIUS.md,
+    padding: SPACING.lg,
     alignItems: 'center',
+    minHeight: TOUCH_TARGETS.recommendedSize,
   },
   submitButtonText: {
     color: COLORS.textPrimary,
-    fontSize: FONTS.size.medium,
-    fontWeight: '600',
+    fontSize: FONTS.size.large,
+    fontWeight: FONTS.weight.semibold,
   },
   toggleButton: {
     alignItems: 'center',
-    padding: SPACING.sm,
+    padding: SPACING.md,
+    minHeight: TOUCH_TARGETS.minSize,
   },
   toggleText: {
     color: COLORS.textSecondary,
-    fontSize: FONTS.size.small,
+    fontSize: FONTS.size.medium,
   },
 });

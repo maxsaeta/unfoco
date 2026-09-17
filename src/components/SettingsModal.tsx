@@ -8,7 +8,7 @@ import {
   Alert,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { COLORS, SPACING, FONTS } from '../constants/theme';
+import { COLORS, SPACING, FONTS, BORDER_RADIUS, TOUCH_TARGETS } from '../constants/theme';
 import { TimerSettings, getTimerSettings, saveTimerSettings } from '../services/settingsService';
 
 interface SettingsModalProps {
@@ -132,8 +132,8 @@ const styles = StyleSheet.create({
   },
   container: {
     backgroundColor: COLORS.surface,
-    borderRadius: 20,
-    padding: SPACING.lg,
+    borderRadius: BORDER_RADIUS.xl,
+    padding: SPACING.xl,
     width: '100%',
     maxWidth: 400,
   },
@@ -141,23 +141,27 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: SPACING.lg,
+    marginBottom: SPACING.xl,
   },
   title: {
     color: COLORS.textPrimary,
-    fontSize: FONTS.size.large,
-    fontWeight: 'bold',
+    fontSize: FONTS.size.xlarge,
+    fontWeight: FONTS.weight.bold,
   },
   closeButton: {
-    padding: SPACING.xs,
+    padding: SPACING.sm,
+    minWidth: TOUCH_TARGETS.minSize,
+    minHeight: TOUCH_TARGETS.minSize,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   section: {
-    marginBottom: SPACING.lg,
+    marginBottom: SPACING.xl,
   },
   sectionTitle: {
     color: COLORS.textPrimary,
-    fontSize: FONTS.size.medium,
-    fontWeight: '600',
+    fontSize: FONTS.size.large,
+    fontWeight: FONTS.weight.semibold,
     marginBottom: SPACING.xs,
   },
   sectionSubtitle: {
@@ -173,11 +177,12 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingVertical: SPACING.md,
     paddingHorizontal: SPACING.sm,
-    borderRadius: 12,
+    borderRadius: BORDER_RADIUS.md,
     backgroundColor: COLORS.background,
     alignItems: 'center',
     borderWidth: 2,
     borderColor: 'transparent',
+    minHeight: TOUCH_TARGETS.minSize,
   },
   optionActive: {
     borderColor: COLORS.accent,
@@ -185,8 +190,8 @@ const styles = StyleSheet.create({
   },
   optionText: {
     color: COLORS.textSecondary,
-    fontSize: FONTS.size.small,
-    fontWeight: '500',
+    fontSize: FONTS.size.medium,
+    fontWeight: FONTS.weight.medium,
   },
   optionTextActive: {
     color: COLORS.textPrimary,
@@ -198,8 +203,8 @@ const styles = StyleSheet.create({
     gap: SPACING.sm,
     paddingVertical: SPACING.md,
     backgroundColor: COLORS.background,
-    borderRadius: 12,
-    marginBottom: SPACING.lg,
+    borderRadius: BORDER_RADIUS.md,
+    marginBottom: SPACING.xl,
   },
   previewText: {
     color: COLORS.textSecondary,
@@ -207,13 +212,14 @@ const styles = StyleSheet.create({
   },
   saveButton: {
     backgroundColor: COLORS.accent,
-    borderRadius: 12,
+    borderRadius: BORDER_RADIUS.md,
     paddingVertical: SPACING.md,
     alignItems: 'center',
+    minHeight: TOUCH_TARGETS.recommendedSize,
   },
   saveButtonText: {
     color: COLORS.textPrimary,
-    fontSize: FONTS.size.medium,
-    fontWeight: '600',
+    fontSize: FONTS.size.large,
+    fontWeight: FONTS.weight.semibold,
   },
 });

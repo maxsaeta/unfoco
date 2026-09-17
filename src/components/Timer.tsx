@@ -1,7 +1,8 @@
 import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
-import { COLORS, SPACING, FONTS } from '../constants/theme';
+import { View, Text, StyleSheet, Animated } from 'react-native';
+import { COLORS, SPACING, FONTS, BORDER_RADIUS } from '../constants/theme';
 import { TimerMode } from '../hooks/useTimer';
+import { formatDuration } from '../shared/utils';
 
 interface TimerProps {
   minutes: number;
@@ -11,31 +12,45 @@ interface TimerProps {
 }
 
 export function Timer({ minutes, seconds, isRunning, mode }: TimerProps) {
-  const formatTime = (min: number, sec: number) => {
-    return `${min.toString().padStart(2, '0')}:${sec.toString().padStart(2, '0')}`;
-  };
-
   const isBreak = mode === 'break';
 
   return (
     <View style={styles.container}>
-      <Text style={[styles.label, isBreak && styles.labelBreak]}>
-        {isBreak ? 'DESCANSO' : 'TIEMPO'}
-      </Text>
-      <Text style={[
-        styles.time, 
-        isRunning && styles.timeRunning,
-        isBreak && styles.timeBreak,
-      ]}>
-        {formatTime(minutes, seconds)}
-      </Text>
-      <Text style={styles.hint}>
-        {isBreak 
-          ? 'Relájate, vuelve cuando estés listo' 
-          : isRunning 
-            ? 'Enfócate en UNA tarea' 
-            : 'Presiona para comenzar'}
-      </Text>
+      <View style={[styles.labelContainer, isBreak && styles.labelContainerBreak]}>
+        <Text style={[styles.label, isBreak && styles.labelBreak]}>
+          {isBreak ? 'DESCANSO' : 'ENFOQUE'}
+        </Text>
+      </View>
+      
+      <View style={[styles.timeContainer, isRunning && styles.timeContainerRunning]}>
+        <Text 
+          style={[
+            styles.time, 
+            isRunning && styles.timeRunning,
+            isBreak && styles.timeBreak,
+          ]}
+          accessibilityLabel={`Tiempo restante: ${minutes} minutos ${seconds} segundos`}
+          accessibilityRole="text"
+        >
+          {formatDuration(minutes, seconds)}
+        </Text>
+      </View>
+
+      <View style={styles.hintContainer}>
+        <Text style={styles.hint}>
+          {isBreak 
+            ? 'Relájate, vuelve cuando estés listo' 
+            : isRunning 
+              ? 'Enfócate en UNA tarea' 
+              : 'Presiona para comenzar'}
+        </Text>
+      </View>
+
+      {isRunning && (
+        <View style={styles.pulseContainer}>
+          <View style={[styles.pulse, isBreak && styles.pulseBreak]} />
+        </View>
+      )}
     </View>
   );
 }
@@ -43,21 +58,43 @@ export function Timer({ minutes, seconds, isRunning, mode }: TimerProps) {
 const styles = StyleSheet.create({
   container: {
     alignItems: 'center',
-    paddingVertical: SPACING.lg,
+    paddingVertical: SPACING.xl,
+    paddingHorizontal: SPACING.lg,
+  },
+  labelContainer: {
+    backgroundColor: COLORS.primary,
+    paddingHorizontal: SPACING.md,
+    paddingVertical: SPACING.xs,
+    borderRadius: BORDER_RADIUS.full,
+    marginBottom: SPACING.md,
+  },
+  labelContainerBreak: {
+    backgroundColor: COLORS.success,
   },
   label: {
-    color: COLORS.textSecondary,
-    fontSize: FONTS.size.small,
+    color: COLORS.textPrimary,
+    fontSize: FONTS.size.xs,
+    fontWeight: FONTS.weight.semibold,
     letterSpacing: 2,
-    marginBottom: SPACING.sm,
+    textTransform: 'uppercase',
   },
   labelBreak: {
-    color: COLORS.success,
+    color: COLORS.textInverse,
+  },
+  timeContainer: {
+    backgroundColor: COLORS.surface,
+    paddingHorizontal: SPACING.xxl,
+    paddingVertical: SPACING.lg,
+    borderRadius: BORDER_RADIUS.xl,
+    marginBottom: SPACING.md,
+  },
+  timeContainerRunning: {
+    backgroundColor: COLORS.surfaceLight,
   },
   time: {
     color: COLORS.textPrimary,
-    fontSize: 64,
-    fontWeight: '200',
+    fontSize: 72,
+    fontWeight: FONTS.weight.light,
     fontVariant: ['tabular-nums'],
   },
   timeRunning: {
@@ -66,9 +103,26 @@ const styles = StyleSheet.create({
   timeBreak: {
     color: COLORS.success,
   },
+  hintContainer: {
+    minHeight: 20,
+  },
   hint: {
     color: COLORS.textMuted,
     fontSize: FONTS.size.small,
-    marginTop: SPACING.sm,
+    textAlign: 'center',
+  },
+  pulseContainer: {
+    position: 'absolute',
+    top: SPACING.xl,
+    right: SPACING.xl,
+  },
+  pulse: {
+    width: 12,
+    height: 12,
+    borderRadius: 6,
+    backgroundColor: COLORS.warning,
+  },
+  pulseBreak: {
+    backgroundColor: COLORS.success,
   },
 });

@@ -11,7 +11,7 @@ import {
   Alert
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { COLORS, SPACING, FONTS } from '../constants/theme';
+import { COLORS, SPACING, FONTS, BORDER_RADIUS, TOUCH_TARGETS } from '../constants/theme';
 import { Task } from '../domain/types';
 
 interface SwipeableTaskProps {
@@ -207,8 +207,8 @@ const styles = StyleSheet.create({
   },
   taskTitle: {
     color: COLORS.textPrimary,
-    fontSize: FONTS.size.large,
-    fontWeight: 'bold',
+    fontSize: FONTS.size.xlarge,
+    fontWeight: FONTS.weight.bold,
     textAlign: 'center',
     marginBottom: SPACING.xs,
   },
@@ -219,24 +219,24 @@ const styles = StyleSheet.create({
   stepCard: {
     flexDirection: 'row',
     backgroundColor: COLORS.surface,
-    borderRadius: 16,
+    borderRadius: BORDER_RADIUS.lg,
     padding: SPACING.lg,
     gap: SPACING.md,
     borderWidth: 1,
-    borderColor: COLORS.primary,
+    borderColor: COLORS.border,
   },
   stepIndicator: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
+    width: 48,
+    height: 48,
+    borderRadius: 24,
     backgroundColor: COLORS.accent,
     alignItems: 'center',
     justifyContent: 'center',
   },
   stepNumber: {
     color: COLORS.textPrimary,
-    fontSize: FONTS.size.medium,
-    fontWeight: 'bold',
+    fontSize: FONTS.size.large,
+    fontWeight: FONTS.weight.bold,
   },
   stepContent: {
     flex: 1,
@@ -244,13 +244,14 @@ const styles = StyleSheet.create({
   },
   stepTitle: {
     color: COLORS.textPrimary,
-    fontSize: FONTS.size.medium,
-    fontWeight: '600',
+    fontSize: FONTS.size.large,
+    fontWeight: FONTS.weight.semibold,
     marginBottom: SPACING.xs,
   },
   stepDescription: {
     color: COLORS.textSecondary,
     fontSize: FONTS.size.small,
+    lineHeight: 20,
   },
   progressBar: {
     flexDirection: 'row',
@@ -258,9 +259,9 @@ const styles = StyleSheet.create({
     gap: SPACING.sm,
   },
   progressDot: {
-    width: 8,
-    height: 8,
-    borderRadius: 4,
+    width: 10,
+    height: 10,
+    borderRadius: 5,
     backgroundColor: COLORS.textMuted,
   },
   progressDotCompleted: {
@@ -268,36 +269,36 @@ const styles = StyleSheet.create({
   },
   progressDotActive: {
     backgroundColor: COLORS.accent,
-    width: 24,
+    width: 28,
   },
   swipeIndicator: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
     gap: SPACING.sm,
-    marginTop: SPACING.xs,
+    marginTop: SPACING.sm,
   },
   swipeText: {
     color: COLORS.textMuted,
-    fontSize: 12,
+    fontSize: FONTS.size.xs,
   },
   menuOverlay: {
     flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.5)',
+    backgroundColor: 'rgba(0,0,0,0.6)',
     justifyContent: 'center',
     alignItems: 'center',
   },
   menuContainer: {
     backgroundColor: COLORS.surface,
-    borderRadius: 20,
+    borderRadius: BORDER_RADIUS.xl,
     padding: SPACING.xl,
-    width: '80%',
-    maxWidth: 300,
+    width: '85%',
+    maxWidth: 320,
   },
   menuTitle: {
     color: COLORS.textPrimary,
     fontSize: FONTS.size.large,
-    fontWeight: 'bold',
+    fontWeight: FONTS.weight.bold,
     textAlign: 'center',
     marginBottom: SPACING.xl,
   },
@@ -307,9 +308,10 @@ const styles = StyleSheet.create({
     gap: SPACING.md,
     paddingVertical: SPACING.md,
     paddingHorizontal: SPACING.lg,
-    borderRadius: 12,
+    borderRadius: BORDER_RADIUS.md,
     backgroundColor: COLORS.background,
     marginBottom: SPACING.md,
+    minHeight: TOUCH_TARGETS.minSize,
   },
   menuItemDanger: {
     backgroundColor: 'rgba(239, 68, 68, 0.1)',
@@ -317,7 +319,7 @@ const styles = StyleSheet.create({
   menuItemText: {
     color: COLORS.textPrimary,
     fontSize: FONTS.size.medium,
-    fontWeight: '500',
+    fontWeight: FONTS.weight.medium,
   },
   menuItemTextDanger: {
     color: COLORS.error,
@@ -325,6 +327,7 @@ const styles = StyleSheet.create({
   menuCancelButton: {
     paddingVertical: SPACING.md,
     alignItems: 'center',
+    minHeight: TOUCH_TARGETS.minSize,
   },
   menuCancelText: {
     color: COLORS.textSecondary,

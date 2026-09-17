@@ -9,7 +9,7 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
-import { COLORS, SPACING, FONTS } from '../../constants/theme';
+import { COLORS, SPACING, FONTS, BORDER_RADIUS, TOUCH_TARGETS } from '../../constants/theme';
 import { Timer } from '../../components/Timer';
 import { SwipeableTask } from '../../components/SwipeableTask';
 import { AddTaskModal } from '../../components/AddTaskModal';
@@ -350,25 +350,29 @@ const styles = StyleSheet.create({
     paddingTop: SPACING.sm,
   },
   logo: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
+    width: 48,
+    height: 48,
+    borderRadius: 24,
     backgroundColor: COLORS.primary,
     alignItems: 'center',
     justifyContent: 'center',
   },
   logoDot: {
-    width: 14,
-    height: 14,
-    borderRadius: 7,
+    width: 16,
+    height: 16,
+    borderRadius: 8,
     backgroundColor: COLORS.accent,
   },
   headerActions: {
     flexDirection: 'row',
-    gap: SPACING.sm,
+    gap: SPACING.xs,
   },
   headerButton: {
     padding: SPACING.sm,
+    minWidth: TOUCH_TARGETS.minSize,
+    minHeight: TOUCH_TARGETS.minSize,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   historyContainer: {
     flex: 1,
@@ -376,8 +380,8 @@ const styles = StyleSheet.create({
   },
   historyTitle: {
     color: COLORS.textPrimary,
-    fontSize: FONTS.size.large,
-    fontWeight: 'bold',
+    fontSize: FONTS.size.xlarge,
+    fontWeight: FONTS.weight.bold,
     marginBottom: SPACING.lg,
   },
   emptyHistory: {
@@ -397,9 +401,10 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: COLORS.surface,
-    borderRadius: 12,
+    borderRadius: BORDER_RADIUS.md,
     padding: SPACING.md,
     gap: SPACING.md,
+    minHeight: TOUCH_TARGETS.minSize,
   },
   historyItemContent: {
     flex: 1,
@@ -407,7 +412,7 @@ const styles = StyleSheet.create({
   historyItemTitle: {
     color: COLORS.textPrimary,
     fontSize: FONTS.size.medium,
-    fontWeight: '600',
+    fontWeight: FONTS.weight.semibold,
     marginBottom: 2,
   },
   historyItemSteps: {
@@ -415,18 +420,19 @@ const styles = StyleSheet.create({
     fontSize: FONTS.size.small,
   },
   actions: {
-    paddingHorizontal: SPACING.md,
+    paddingHorizontal: SPACING.lg,
     gap: SPACING.md,
   },
   mainButton: {
     flexDirection: 'row',
     backgroundColor: COLORS.accent,
-    borderRadius: 50,
+    borderRadius: BORDER_RADIUS.full,
     paddingVertical: SPACING.md,
     paddingHorizontal: SPACING.xl,
     alignItems: 'center',
     justifyContent: 'center',
     gap: SPACING.sm,
+    minHeight: TOUCH_TARGETS.recommendedSize,
   },
   mainButtonPause: {
     backgroundColor: COLORS.warning,
@@ -436,8 +442,8 @@ const styles = StyleSheet.create({
   },
   mainButtonText: {
     color: COLORS.textPrimary,
-    fontSize: FONTS.size.medium,
-    fontWeight: '600',
+    fontSize: FONTS.size.large,
+    fontWeight: FONTS.weight.semibold,
   },
   secondaryActions: {
     flexDirection: 'row',
@@ -446,9 +452,9 @@ const styles = StyleSheet.create({
     gap: SPACING.xl,
   },
   iconButtonComplete: {
-    width: 56,
-    height: 44,
-    borderRadius: 12,
+    width: TOUCH_TARGETS.recommendedSize,
+    height: TOUCH_TARGETS.recommendedSize,
+    borderRadius: BORDER_RADIUS.md,
     backgroundColor: COLORS.surface,
     alignItems: 'center',
     justifyContent: 'center',
@@ -456,9 +462,9 @@ const styles = StyleSheet.create({
     borderColor: COLORS.success,
   },
   addButton: {
-    width: 56,
-    height: 44,
-    borderRadius: 12,
+    width: TOUCH_TARGETS.recommendedSize,
+    height: TOUCH_TARGETS.recommendedSize,
+    borderRadius: BORDER_RADIUS.md,
     backgroundColor: COLORS.accent,
     alignItems: 'center',
     justifyContent: 'center',
@@ -471,9 +477,10 @@ const styles = StyleSheet.create({
     paddingVertical: SPACING.sm,
     paddingHorizontal: SPACING.md,
     backgroundColor: COLORS.surface,
-    borderRadius: 20,
+    borderRadius: BORDER_RADIUS.full,
     borderWidth: 1,
-    borderColor: COLORS.textMuted,
+    borderColor: COLORS.border,
+    minHeight: TOUCH_TARGETS.minSize,
   },
   skipBreakText: {
     color: COLORS.textSecondary,
@@ -481,17 +488,17 @@ const styles = StyleSheet.create({
   },
   emptyState: {
     alignItems: 'center',
-    paddingVertical: SPACING.xxl,
+    paddingVertical: SPACING.xxxl,
     gap: SPACING.md,
   },
   emptyTitle: {
     color: COLORS.textPrimary,
-    fontSize: FONTS.size.large,
-    fontWeight: 'bold',
+    fontSize: FONTS.size.xlarge,
+    fontWeight: FONTS.weight.bold,
   },
   emptySubtitle: {
     color: COLORS.textSecondary,
-    fontSize: FONTS.size.small,
+    fontSize: FONTS.size.medium,
   },
   footer: {
     alignItems: 'center',
@@ -502,13 +509,13 @@ const styles = StyleSheet.create({
     gap: SPACING.sm,
   },
   dot: {
-    width: 8,
-    height: 8,
-    borderRadius: 4,
+    width: 10,
+    height: 10,
+    borderRadius: 5,
     backgroundColor: COLORS.textMuted,
   },
   dotActive: {
     backgroundColor: COLORS.accent,
-    width: 24,
+    width: 28,
   },
 });
