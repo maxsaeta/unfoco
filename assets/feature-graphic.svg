@@ -1,0 +1,95 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 500" width="1024" height="500">
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#1a1a2e;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#16213e;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="accentGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#00BCD4;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#00E5FF;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Background -->
+  <rect width="1024" height="500" fill="url(#bgGrad)"/>
+  
+  <!-- Decorative circles -->
+  <circle cx="100" cy="400" r="200" fill="#00BCD4" opacity="0.05"/>
+  <circle cx="900" cy="100" r="150" fill="#00BCD4" opacity="0.05"/>
+  
+  <!-- Logo icon (left side) -->
+  <g transform="translate(200, 250) scale(0.8)">
+    <!-- Outer ring -->
+    <circle cx="0" cy="0" r="120" fill="none" stroke="url(#accentGrad)" stroke-width="6" stroke-linecap="round" stroke-dasharray="80 20 40 20"/>
+    
+    <!-- U shape -->
+    <path d="M -60 -30 
+             L -60 50 
+             Q -60 100 0 100 
+             L 60 100 
+             Q 120 100 120 50 
+             L 120 -30" 
+          fill="none" 
+          stroke="url(#accentGrad)" 
+          stroke-width="24" 
+          stroke-linecap="round"
+          stroke-linejoin="round"/>
+    
+    <!-- Check -->
+    <path d="M -20 20 
+             L 10 50 
+             L 60 -10" 
+          fill="none" 
+          stroke="#FFFFFF" 
+          stroke-width="16" 
+          stroke-linecap="round"
+          stroke-linejoin="round"/>
+    
+    <!-- Arrow -->
+    <path d="M 130 35 
+             L 180 35 
+             L 180 15 
+             L 210 45 
+             L 180 75 
+             L 180 55 
+             L 130 55" 
+          fill="#00E5FF" 
+          stroke="none"/>
+  </g>
+  
+  <!-- App name (right side) -->
+  <text x="550" y="180" 
+        font-family="Arial, Helvetica, sans-serif" 
+        font-size="80" 
+        font-weight="bold" 
+        fill="#FFFFFF">UNPASO</text>
+  
+  <!-- Tagline -->
+  <text x="550" y="260" 
+        font-family="Arial, Helvetica, sans-serif" 
+        font-size="32" 
+        fill="#00BCD4">Una tarea a la vez</text>
+  
+  <!-- Features -->
+  <text x="550" y="330" 
+        font-family="Arial, Helvetica, sans-serif" 
+        font-size="24" 
+        fill="#a0a0a0">• Temporizador Pomodoro</text>
+  <text x="550" y="370" 
+        font-family="Arial, Helvetica, sans-serif" 
+        font-size="24" 
+        fill="#a0a0a0">• Generación de pasos con IA</text>
+  <text x="550" y="410" 
+        font-family="Arial, Helvetica, sans-serif" 
+        font-size="24" 
+        fill="#a0a0a0">• Estadísticas de productividad</text>
+  
+  <!-- ADHD badge -->
+  <rect x="550" y="440" width="200" height="36" rx="18" fill="#e94560"/>
+  <text x="650" y="465" 
+        font-family="Arial, Helvetica, sans-serif" 
+        font-size="16" 
+        font-weight="bold"
+        fill="#FFFFFF" 
+        text-anchor="middle">Diseñado para TDAH</text>
+</svg>

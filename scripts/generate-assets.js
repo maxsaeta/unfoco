@@ -63,6 +63,14 @@ async function generateAssets() {
     .toFile(path.join(assetsDir, 'favicon.png'));
   console.log('   ✓ favicon.png');
 
+  // 7. Feature graphic for Play Store (1024x500)
+  console.log('7. Creating feature graphic...');
+  await sharp(path.join(assetsDir, 'feature-graphic.svg'))
+    .resize(1024, 500)
+    .png()
+    .toFile(path.join(assetsDir, 'feature-graphic.png'));
+  console.log('   ✓ feature-graphic.png');
+
   console.log('\n✅ All assets generated successfully!');
 }
 
