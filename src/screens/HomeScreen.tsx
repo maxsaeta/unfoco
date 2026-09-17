@@ -15,6 +15,7 @@ import { SwipeableTask } from '../components/SwipeableTask';
 import { AddTaskModal } from '../components/AddTaskModal';
 import { EditTaskModal } from '../components/EditTaskModal';
 import { SettingsModal } from '../components/SettingsModal';
+import { StatsModal } from '../components/StatsModal';
 import { useTimer } from '../hooks/useTimer';
 import { 
   getUserTasks, 
@@ -29,6 +30,7 @@ import {
 import { logout } from '../services/authService';
 import { getTimerSettings, TimerSettings } from '../services/settingsService';
 import { registerForPushNotifications } from '../services/notificationService';
+import { incrementPomodoro, incrementTaskCompleted } from '../services/statsService';
 import { auth } from '../config/firebase';
 
 export function HomeScreen() {
@@ -39,6 +41,7 @@ export function HomeScreen() {
   const [showEditModal, setShowEditModal] = useState(false);
   const [showHistory, setShowHistory] = useState(false);
   const [showSettingsModal, setShowSettingsModal] = useState(false);
+  const [showStatsModal, setShowStatsModal] = useState(false);
   const [taskToEdit, setTaskToEdit] = useState<Task | null>(null);
   const [timerSettings, setTimerSettings] = useState<TimerSettings>({ workMinutes: 25, breakMinutes: 5 });
   const longPressTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -54,6 +57,7 @@ export function HomeScreen() {
     workMinutes: timerSettings.workMinutes,
     breakMinutes: timerSettings.breakMinutes,
     onWorkComplete: () => {
+      incrementPomodoro(timerSettings.workMinutes);
       Alert.alert(
         '⏰ ¡Pomodoro completado!', 
         `Tómate un descanso de ${timerSettings.breakMinutes} minutos. El timer arrancará automáticamente.`,
@@ -144,6 +148,7 @@ export function HomeScreen() {
       timer.reset();
 
       if (result.allCompleted) {
+        incrementTaskCompleted();
         Alert.alert('🎉 ¡Felicidades!', `Completaste la tarea: ${currentTask.title}`);
         if (currentTaskIndex >= activeTasks.length - 1) {
           setCurrentTaskIndex(Math.max(0, activeTasks.length - 2));
@@ -247,6 +252,12 @@ export function HomeScreen() {
             <View style={styles.logoDot} />
           </View>
           <View style={styles.headerActions}>
+            <TouchableOpacity 
+              onPress={() => setShowStatsModal(true)} 
+              style={styles.headerButton}
+            >
+              <Ionicons name="stats-chart" size={24} color={COLORS.textSecondary} />
+            </TouchableOpacity>
             <TouchableOpacity 
               onPress={() => setShowSettingsModal(true)} 
               style={styles.headerButton}
@@ -422,6 +433,12 @@ export function HomeScreen() {
         visible={showSettingsModal}
         onClose={() => setShowSettingsModal(false)}
         onSave={handleSettingsSave}
+      />
+
+      {/* Modal Estadísticas */}
+      <StatsModal
+        visible={showStatsModal}
+        onClose={() => setShowStatsModal(false)}
       />
     </SafeAreaView>
   );
