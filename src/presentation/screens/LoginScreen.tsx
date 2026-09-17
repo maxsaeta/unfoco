@@ -30,10 +30,7 @@ export function LoginScreen() {
         <View style={styles.content}>
           {/* Logo */}
           <View style={styles.logoContainer}>
-            <View style={styles.logo}>
-              <View style={styles.logoDot} />
-            </View>
-            <Text style={styles.appName}>UnPaso</Text>
+            <Text style={styles.appName}>NeuroPaso</Text>
             <Text style={styles.tagline}>Un paso a la vez</Text>
           </View>
 
@@ -116,12 +113,6 @@ const useStyles = (colors: Colors) => StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: SPACING.lg,
-  },
-  logoDot: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
-    backgroundColor: colors.accent,
   },
   appName: {
     color: colors.textPrimary,

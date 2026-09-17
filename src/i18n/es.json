@@ -1,0 +1,152 @@
+{
+  "app": {
+    "name": "NeuroPaso",
+    "tagline": "Un paso a la vez"
+  },
+  "common": {
+    "save": "Guardar",
+    "cancel": "Cancelar",
+    "delete": "Eliminar",
+    "edit": "Modificar",
+    "close": "Cerrar",
+    "loading": "Cargando...",
+    "back": "Atrás",
+    "next": "Siguiente",
+    "done": "Listo",
+    "yes": "Sí",
+    "no": "No"
+  },
+  "home": {
+    "title": "NeuroPaso",
+    "emptyTitle": "Sin tareas",
+    "emptySubtitle": "Toca + para agregar tu primera tarea",
+    "taskCounter": "Tarea {current} de {total}",
+    "priorities": "Prioridades",
+    "mood": "Ánimo",
+    "closeDay": "Cerrar Día",
+    "history": "Historial de Tareas",
+    "emptyHistory": "No hay tareas completadas aún",
+    "stepsCompleted": "{count} pasos completados",
+    "duration": "Duración: {duration}",
+    "startDate": "Inicio: {date}",
+    "endDate": "Fin: {date}",
+    "aiDisclosure": "Utiliza IA generativa para crear pasos de tareas",
+    "report": "Reportar"
+  },
+  "timer": {
+    "start": "EMPEZAR",
+    "pause": "PAUSAR",
+    "pauseBreak": "PAUSAR DESCANSO",
+    "startBreak": "INICIAR DESCANSO",
+    "skipBreak": "Saltar descanso",
+    "workComplete": "¡Pomodoro completado!",
+    "workCompleteMessage": "Tómate un descanso de {minutes} minutos. El timer arrancará automáticamente.",
+    "breakComplete": "¡Descanso terminado!",
+    "breakCompleteMessage": "¿Listo para otro Pomodoro?"
+  },
+  "task": {
+    "deleteTitle": "Eliminar tarea",
+    "deleteMessage": "¿Estás seguro de que quieres eliminar \"{title}\"?",
+    "stepProgress": "Paso {current} de {total}",
+    "nextAction": "Siguiente acción:",
+    "doubleTapHint": "Doble clic para opciones",
+    "estimatedTime": "Tiempo estimado: ~{minutes} min",
+    "totalEstimated": "Tiempo total estimado: ~{minutes} min"
+  },
+  "priorities": {
+    "title": "🧠 Prioridades del Día",
+    "subtitle": "Elige solo 3 cosas. Menos es más.",
+    "theThing": "LA Prioridad",
+    "theThingSubtitle": "Si haces solo una cosa, haz esta",
+    "wouldBeNice": "Estaría Bien",
+    "wouldBeNiceSubtitle": "Importante pero no crítica hoy",
+    "ifOnFire": "Si Estoy Encendido",
+    "ifOnFireSubtitle": "Solo si vas sobrado",
+    "theThingPlaceholder": "¿Cuál es tu prioridad principal hoy?",
+    "wouldBeNicePlaceholder": "¿Qué más sería bueno hacer?",
+    "ifOnFirePlaceholder": "¿Algo extra si tienes energía?",
+    "save": "Guardar Prioridades",
+    "saved": "¡Guardado!"
+  },
+  "mood": {
+    "title": "💚 ¿Cómo te sientes?",
+    "subtitle": "No hay días malos, solo días diferentes. Tu cerebro funciona distinto y está bien.",
+    "great": "Genial",
+    "good": "Bien",
+    "okay": "Regular",
+    "low": "Bajo",
+    "bad": "Mal",
+    "tipGreat": "¡Aprovecha esta energía para LA cosa importante!",
+    "tipGood": "¡Buen momento para avanzar!",
+    "tipOkay": "Está bien. Haz lo que puedas y descansa.",
+    "tipLow": "Hoy es día de mantenimiento: come, hidrátate, descansa. No fuerces.",
+    "tipBad": "Solo enfócate en lo básico: come, descansa, sé amable contigo.",
+    "save": "Registrar ánimo",
+    "saved": "¡Guardado!",
+    "historyTitle": "Últimos días"
+  },
+  "shutdown": {
+    "title": "🌙 Ritual de Cierre",
+    "subtitle": "5 minutos para cerrar el día con calma. No trabajes más.",
+    "writeTomorrow": "Escribe LA Prioridad de mañana",
+    "writeTomorrowPlaceholder": "¿Cuál es tu tarea principal de mañana?",
+    "checkCalendar": "Revisa el calendario de mañana",
+    "clearDesk": "Limpia un escritorio/carpeta",
+    "sayDone": "Di en voz alta: Hoy terminé",
+    "timeWrite": "~30 seg",
+    "timeCheck": "~30 seg",
+    "timeClear": "~2 min",
+    "timeSay": "~5 seg",
+    "save": "Cerrar el día",
+    "complete": "Completa el ritual",
+    "saved": "¡Buen descanso! 🌙"
+  },
+  "settings": {
+    "title": "Configurar Timer",
+    "workDuration": "Tiempo de trabajo",
+    "breakDuration": "Tiempo de descanso",
+    "preview": "{work} min trabajo + {break} min descanso",
+    "appearance": "Apariencia",
+    "language": "Idioma",
+    "system": "Sistema",
+    "light": "Claro",
+    "dark": "Oscuro",
+    "spanish": "Español",
+    "english": "Inglés"
+  },
+  "stats": {
+    "title": "📊 Estadísticas",
+    "totalPomodoros": "Pomodoros totales",
+    "totalTasks": "Tareas completadas",
+    "totalMinutes": "Minutos enfocado",
+    "streak": "Racha actual",
+    "days": "días"
+  },
+  "privacy": {
+    "title": "Política de Privacidad"
+  },
+  "deleteAccount": {
+    "title": "Eliminar Cuenta",
+    "confirm": "¿Estás seguro? Esta acción no se puede deshacer."
+  },
+  "reportAI": {
+    "title": "Reportar Problema con IA",
+    "placeholder": "Describe el problema con la respuesta de la IA..."
+  },
+  "celebration": {
+    "stepComplete": "¡Paso completado!",
+    "taskComplete": "¡Tarea completada!",
+    "greatWork": "¡Buen trabajo!",
+    "keepGoing": "¡Sigue así!",
+    "halfway": "¡Ya llevas la mitad!"
+  },
+  "greeting": {
+    "morning": "Buenos días",
+    "afternoon": "Buenas tardes",
+    "evening": "Buenas noches"
+  },
+  "stateSummary": {
+    "inProgress": "Tienes {tasks} tarea(s) con {steps}/{total} pasos completados",
+    "welcomeBack": "¡Bienvenido de vuelta!"
+  }
+}

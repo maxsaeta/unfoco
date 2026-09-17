@@ -1,4 +1,4 @@
-import React, { useRef } from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 import { 
   View, 
   Text,
@@ -7,13 +7,15 @@ import {
   TouchableOpacity,
   ActivityIndicator,
   ScrollView,
-  Platform
+  Platform,
+  Animated
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { SPACING, FONTS, BORDER_RADIUS, TOUCH_TARGETS } from '../../constants/theme';
 import { Colors } from '../../constants/theme';
 import { useTheme } from '../../context/ThemeContext';
+import { useLanguage } from '../../i18n';
 import { Timer } from '../../components/Timer';
 import { SwipeableTask } from '../../components/SwipeableTask';
 import { AddTaskModal } from '../../components/AddTaskModal';
@@ -23,6 +25,9 @@ import { StatsModal } from '../../components/StatsModal';
 import { PrivacyPolicyModal } from '../../components/PrivacyPolicyModal';
 import { DeleteAccountModal } from '../../components/DeleteAccountModal';
 import { ReportAIModal } from '../../components/ReportAIModal';
+import { DailyBrainDump } from '../../components/DailyBrainDump';
+import { ShutdownRitual } from '../../components/ShutdownRitual';
+import { MoodTracker } from '../../components/MoodTracker';
 import { useTimer } from '../../hooks/useTimer';
 import { useHomeViewModel } from './HomeViewModel';
 import { registerForPushNotifications } from '../../services/notificationService';
@@ -46,6 +51,9 @@ export function HomeScreen() {
     setShowPrivacyModal,
     setShowDeleteAccountModal,
     setShowReportAIModal,
+    setShowBrainDump,
+    setShowShutdownRitual,
+    setShowMoodTracker,
     setTaskToEdit,
     handleAddTask,
     handleStartTask,
@@ -53,12 +61,48 @@ export function HomeScreen() {
     handleDeleteTask,
     handleSettingsSave,
     handleLogout,
+    refreshDailyPriorities,
   } = useHomeViewModel();
 
   const { colors } = useTheme();
+  const { t } = useLanguage();
   const styles = useStyles(colors);
 
   const longPressTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const [celebrationMessage, setCelebrationMessage] = useState<string | null>(null);
+  const celebrationOpacity = useRef(new Animated.Value(0)).current;
+
+  const showCelebration = (type: 'step' | 'task') => {
+    const message = type === 'task' 
+      ? t('celebration.taskComplete') 
+      : t('celebration.stepComplete');
+    
+    setCelebrationMessage(message);
+    celebrationOpacity.setValue(0);
+    
+    Animated.sequence([
+      Animated.timing(celebrationOpacity, {
+        toValue: 1,
+        duration: 300,
+        useNativeDriver: true,
+      }),
+      Animated.delay(2000),
+      Animated.timing(celebrationOpacity, {
+        toValue: 0,
+        duration: 300,
+        useNativeDriver: true,
+      }),
+    ]).start(() => {
+      setCelebrationMessage(null);
+    });
+  };
+
+  const handleCompleteStepWithCelebration = async () => {
+    const result = await handleCompleteStep();
+    if (result) {
+      showCelebration(result);
+    }
+  };
 
   const timer = useTimer({
     workMinutes: state.timerSettings.workMinutes,
@@ -166,6 +210,26 @@ export function HomeScreen() {
     );
   }
 
+  // Saludo según hora del día
+  const getGreeting = () => {
+    const hour = new Date().getHours();
+    if (hour < 12) return t('greeting.morning');
+    if (hour < 18) return t('greeting.afternoon');
+    return t('greeting.evening');
+  };
+
+  // Resumen de progreso
+  const getProgressSummary = () => {
+    if (activeTasks.length === 0) return null;
+    
+    const totalSteps = activeTasks.reduce((sum, task) => sum + task.steps.length, 0);
+    const completedSteps = activeTasks.reduce((sum, task) => sum + task.steps.filter(s => s.completed).length, 0);
+    
+    return { totalTasks: activeTasks.length, totalSteps, completedSteps };
+  };
+
+  const progressSummary = getProgressSummary();
+
   return (
     <SafeAreaView style={styles.container} edges={['top', 'left', 'right']}>
       <ScrollView 
@@ -173,12 +237,39 @@ export function HomeScreen() {
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
       >
+        {/* Resumen de Estado - Restate State */}
+        {progressSummary && progressSummary.completedSteps > 0 && (
+          <View style={styles.stateSummary}>
+            <Text style={styles.greeting}>{getGreeting()}</Text>
+            <View style={styles.stateSummaryContent}>
+              <Ionicons name="time" size={20} color={colors.info} />
+              <Text style={styles.stateSummaryText}>
+                {t('stateSummary.inProgress', { 
+                  tasks: progressSummary.totalTasks, 
+                  steps: progressSummary.completedSteps,
+                  total: progressSummary.totalSteps 
+                })}
+              </Text>
+            </View>
+          </View>
+        )}
+
         {/* Header */}
         <View style={styles.header}>
-          <View style={styles.logo}>
-            <View style={styles.logoDot} />
-          </View>
+          <Text style={styles.headerTitle}>NeuroPaso</Text>
           <View style={styles.headerActions}>
+            <TouchableOpacity 
+              onPress={() => setShowMoodTracker(true)} 
+              style={styles.headerButton}
+            >
+              <Ionicons name="heart-outline" size={24} color={colors.textSecondary} />
+            </TouchableOpacity>
+            <TouchableOpacity 
+              onPress={() => setShowBrainDump(true)} 
+              style={styles.headerButton}
+            >
+              <Ionicons name="bulb-outline" size={24} color={colors.textSecondary} />
+            </TouchableOpacity>
             <TouchableOpacity 
               onPress={() => setShowStatsModal(true)} 
               style={styles.headerButton}
@@ -329,7 +420,7 @@ export function HomeScreen() {
               <View style={styles.secondaryActions}>
                 {/* Botón Completar paso */}
                 {currentTask && (
-                  <TouchableOpacity style={styles.iconButtonComplete} onPress={handleCompleteStep}>
+                  <TouchableOpacity style={styles.iconButtonComplete} onPress={handleCompleteStepWithCelebration}>
                     <Ionicons name="checkmark-circle" size={28} color={colors.success} />
                   </TouchableOpacity>
                 )}
@@ -342,6 +433,33 @@ export function HomeScreen() {
                   <Ionicons name="add" size={28} color={colors.textPrimary} />
                 </TouchableOpacity>
               </View>
+            </View>
+
+            {/* Quick Actions - Brain Dump, Shutdown, Mood */}
+            <View style={styles.quickActions}>
+              <TouchableOpacity 
+                style={styles.quickAction}
+                onPress={() => setShowBrainDump(true)}
+              >
+                <Ionicons name="bulb" size={20} color={colors.warning} />
+                <Text style={styles.quickActionText}>Prioridades</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity 
+                style={styles.quickAction}
+                onPress={() => setShowMoodTracker(true)}
+              >
+                <Ionicons name="heart" size={20} color={colors.error} />
+                <Text style={styles.quickActionText}>Ánimo</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity 
+                style={styles.quickAction}
+                onPress={() => setShowShutdownRitual(true)}
+              >
+                <Ionicons name="moon" size={20} color={colors.info} />
+                <Text style={styles.quickActionText}>Cerrar Día</Text>
+              </TouchableOpacity>
             </View>
 
             {/* Contador de tareas */}
@@ -391,6 +509,26 @@ export function HomeScreen() {
         )}
       </ScrollView>
 
+      {/* Celebration Overlay */}
+      {celebrationMessage && (
+        <Animated.View 
+          style={[
+            styles.celebrationContainer,
+            { opacity: celebrationOpacity }
+          ]}
+          pointerEvents="none"
+        >
+          <View style={styles.celebrationContent}>
+            <Ionicons 
+              name="trophy" 
+              size={48} 
+              color={colors.warning} 
+            />
+            <Text style={styles.celebrationText}>{celebrationMessage}</Text>
+          </View>
+        </Animated.View>
+      )}
+
       {/* Modal Agregar Tarea */}
       <AddTaskModal
         visible={state.showAddModal}
@@ -439,6 +577,29 @@ export function HomeScreen() {
         visible={state.showReportAIModal}
         onClose={() => setShowReportAIModal(false)}
       />
+
+      {/* Modal Brain Dump - Prioridades del Día */}
+      <DailyBrainDump
+        visible={state.showBrainDump}
+        onClose={() => {
+          setShowBrainDump(false);
+          refreshDailyPriorities();
+        }}
+        tasks={activeTasks}
+      />
+
+      {/* Modal Shutdown Ritual - Cerrar el Día */}
+      <ShutdownRitual
+        visible={state.showShutdownRitual}
+        onClose={() => setShowShutdownRitual(false)}
+        tasks={activeTasks}
+      />
+
+      {/* Modal Mood Tracker - Ánimo */}
+      <MoodTracker
+        visible={state.showMoodTracker}
+        onClose={() => setShowMoodTracker(false)}
+      />
     </SafeAreaView>
   );
 }
@@ -473,19 +634,10 @@ const useStyles = (colors: Colors) => StyleSheet.create({
     paddingHorizontal: SPACING.lg,
     paddingTop: SPACING.sm,
   },
-  logo: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
-    backgroundColor: colors.primary,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  logoDot: {
-    width: 16,
-    height: 16,
-    borderRadius: 8,
-    backgroundColor: colors.accent,
+  headerTitle: {
+    color: colors.textPrimary,
+    fontSize: FONTS.size.xlarge,
+    fontWeight: FONTS.weight.bold,
   },
   headerActions: {
     flexDirection: 'row',
@@ -497,6 +649,29 @@ const useStyles = (colors: Colors) => StyleSheet.create({
     minHeight: TOUCH_TARGETS.minSize,
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  stateSummary: {
+    backgroundColor: colors.tintedInfo,
+    borderRadius: BORDER_RADIUS.md,
+    padding: SPACING.md,
+    marginHorizontal: SPACING.lg,
+    marginBottom: SPACING.md,
+  },
+  greeting: {
+    color: colors.info,
+    fontSize: FONTS.size.large,
+    fontWeight: FONTS.weight.bold,
+    marginBottom: SPACING.xs,
+  },
+  stateSummaryContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: SPACING.sm,
+  },
+  stateSummaryText: {
+    color: colors.textPrimary,
+    fontSize: FONTS.size.small,
+    flex: 1,
   },
   historyContainer: {
     flex: 1,
@@ -638,6 +813,28 @@ const useStyles = (colors: Colors) => StyleSheet.create({
     color: colors.textSecondary,
     fontSize: FONTS.size.medium,
   },
+  quickActions: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    gap: SPACING.lg,
+    paddingHorizontal: SPACING.lg,
+    marginTop: SPACING.lg,
+    paddingVertical: SPACING.md,
+    backgroundColor: colors.surface,
+    borderRadius: BORDER_RADIUS.md,
+    marginHorizontal: SPACING.lg,
+  },
+  quickAction: {
+    alignItems: 'center',
+    gap: SPACING.xs,
+    padding: SPACING.sm,
+    minWidth: 70,
+  },
+  quickActionText: {
+    color: colors.textSecondary,
+    fontSize: FONTS.size.xsmall,
+    fontWeight: FONTS.weight.medium,
+  },
   footer: {
     alignItems: 'center',
     paddingBottom: SPACING.md,
@@ -687,5 +884,34 @@ const useStyles = (colors: Colors) => StyleSheet.create({
     color: colors.accent,
     fontSize: FONTS.size.xsmall,
     textDecorationLine: 'underline',
+  },
+  celebrationContainer: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: 'rgba(0, 0, 0, 0.7)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    zIndex: 1000,
+  },
+  celebrationContent: {
+    backgroundColor: colors.surface,
+    borderRadius: BORDER_RADIUS.xl,
+    padding: SPACING.xl,
+    alignItems: 'center',
+    gap: SPACING.md,
+    shadowColor: colors.shadow,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 8,
+  },
+  celebrationText: {
+    color: colors.textPrimary,
+    fontSize: FONTS.size.large,
+    fontWeight: FONTS.weight.bold,
+    textAlign: 'center',
   },
 });

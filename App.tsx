@@ -6,6 +6,7 @@ import { HomeScreen } from './src/presentation/screens/HomeScreen';
 import { LoginScreen } from './src/presentation/screens/LoginScreen';
 import { useAuth } from './src/hooks/useAuth';
 import { ThemeProvider, useTheme } from './src/context/ThemeContext';
+import { LanguageProvider } from './src/i18n';
 
 function AppContent() {
   const { user, loading } = useAuth();
@@ -40,9 +41,11 @@ function AppContent() {
 
 export default function App() {
   return (
-    <ThemeProvider>
-      <AppContent />
-    </ThemeProvider>
+    <LanguageProvider>
+      <ThemeProvider>
+        <AppContent />
+      </ThemeProvider>
+    </LanguageProvider>
   );
 }
 

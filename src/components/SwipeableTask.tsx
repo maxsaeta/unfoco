@@ -16,6 +16,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { SPACING, FONTS, BORDER_RADIUS, TOUCH_TARGETS } from '../constants/theme';
 import { Colors } from '../constants/theme';
 import { useTheme } from '../context/ThemeContext';
+import { useLanguage } from '../i18n';
 import { Task } from '../domain/types';
 
 interface SwipeableTaskProps {
@@ -52,6 +53,7 @@ export function SwipeableTask({
   const callbacksRef = useRef({ onSwipeLeft, onSwipeRight, onDelete, onEdit });
   
   const { colors } = useTheme();
+  const { t } = useLanguage();
   const styles = useStyles(colors);
 
   taskRef.current = task;
@@ -59,6 +61,11 @@ export function SwipeableTask({
 
   const currentStep = task.steps.find(step => !step.completed) || task.steps[task.steps.length - 1];
   const completedSteps = task.steps.filter(step => step.completed).length;
+  const totalEstimatedMinutes = task.steps.reduce((sum, step) => sum + (step.estimatedMinutes || 0), 0);
+  
+  // Siguiente paso (el que viene después del actual)
+  const currentIndex = task.steps.findIndex(step => step === currentStep);
+  const nextStep = currentIndex < task.steps.length - 1 ? task.steps[currentIndex + 1] : null;
 
   const handleWebPointerDown = () => {
     const now = Date.now();
@@ -124,12 +131,12 @@ export function SwipeableTask({
   const handleDelete = () => {
     setShowMenu(false);
     Alert.alert(
-      'Eliminar tarea',
-      `¿Estás seguro de que quieres eliminar "${task.title}"?`,
+      t('task.deleteTitle'),
+      t('task.deleteMessage', { title: task.title }),
       [
-        { text: 'Cancelar', style: 'cancel' },
+        { text: t('common.cancel'), style: 'cancel' },
         { 
-          text: 'Eliminar', 
+          text: t('common.delete'), 
           style: 'destructive',
           onPress: () => callbacksRef.current.onDelete()
         }
@@ -147,9 +154,19 @@ export function SwipeableTask({
       <View style={styles.taskHeader}>
         <Text style={styles.taskTitle}>{task.title}</Text>
         <Text style={styles.taskProgress}>
-          Paso {completedSteps + 1} de {task.steps.length}
+          {t('task.stepProgress', { current: completedSteps + 1, total: task.steps.length })}
         </Text>
       </View>
+
+      {/* Tiempo total estimado */}
+      {totalEstimatedMinutes > 0 && (
+        <View style={styles.totalTimeContainer}>
+          <Ionicons name="timer-outline" size={16} color={colors.info} />
+          <Text style={styles.totalTimeText}>
+            {t('task.totalEstimated', { minutes: totalEstimatedMinutes })}
+          </Text>
+        </View>
+      )}
 
       <ScrollView style={styles.stepScroll} nestedScrollEnabled={true}>
         <View style={styles.stepCard}>
@@ -161,9 +178,30 @@ export function SwipeableTask({
             {currentStep.description ? (
               <Text style={styles.stepDescription}>{currentStep.description}</Text>
             ) : null}
+            {currentStep.estimatedMinutes ? (
+              <View style={styles.timeEstimate}>
+                <Ionicons name="time-outline" size={14} color={colors.textMuted} />
+                <Text style={styles.timeEstimateText}>
+                  {t('task.estimatedTime', { minutes: currentStep.estimatedMinutes })}
+                </Text>
+              </View>
+            ) : null}
           </View>
         </View>
       </ScrollView>
+
+      {/* CTA - Siguiente Acción */}
+      {nextStep && (
+        <View style={styles.ctaContainer}>
+          <View style={styles.ctaIcon}>
+            <Ionicons name="flash" size={16} color={colors.warning} />
+          </View>
+          <Text style={styles.ctaLabel}>{t('task.nextAction')}</Text>
+          <Text style={styles.ctaText} numberOfLines={2}>
+            {nextStep.title}
+          </Text>
+        </View>
+      )}
 
       <View style={styles.progressBar}>
         {task.steps.map((step, index) => (
@@ -180,7 +218,7 @@ export function SwipeableTask({
 
       <View style={styles.swipeIndicator}>
         <Ionicons name="chevron-back" size={16} color={colors.textMuted} />
-        <Text style={styles.swipeText}>Doble clic para opciones</Text>
+        <Text style={styles.swipeText}>{t('task.doubleTapHint') || 'Doble clic para opciones'}</Text>
         <Ionicons name="chevron-forward" size={16} color={colors.textMuted} />
       </View>
     </>
@@ -256,12 +294,12 @@ export function SwipeableTask({
             
             <TouchableOpacity style={styles.menuItem} onPress={handleEdit}>
               <Ionicons name="create-outline" size={24} color={colors.accent} />
-              <Text style={styles.menuItemText}>Modificar tarea</Text>
+              <Text style={styles.menuItemText}>{t('common.edit') || 'Modificar'}</Text>
             </TouchableOpacity>
 
             <TouchableOpacity style={[styles.menuItem, styles.menuItemDanger]} onPress={handleDelete}>
               <Ionicons name="trash-outline" size={24} color={colors.error} />
-              <Text style={[styles.menuItemText, styles.menuItemTextDanger]}>Eliminar tarea</Text>
+              <Text style={[styles.menuItemText, styles.menuItemTextDanger]}>{t('common.delete')}</Text>
             </TouchableOpacity>
 
             <TouchableOpacity 
@@ -356,6 +394,64 @@ const useStyles = (colors: Colors) => StyleSheet.create({
     color: colors.textSecondary,
     fontSize: FONTS.size.small,
     lineHeight: 20,
+  },
+  timeEstimate: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: SPACING.xs,
+    marginTop: SPACING.sm,
+    paddingTop: SPACING.sm,
+    borderTopWidth: 1,
+    borderTopColor: colors.border,
+  },
+  timeEstimateText: {
+    color: colors.textMuted,
+    fontSize: FONTS.size.xsmall,
+  },
+  totalTimeContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: SPACING.sm,
+    paddingVertical: SPACING.sm,
+    backgroundColor: colors.tintedInfo,
+    borderRadius: BORDER_RADIUS.md,
+    marginBottom: SPACING.sm,
+  },
+  totalTimeText: {
+    color: colors.info,
+    fontSize: FONTS.size.small,
+    fontWeight: FONTS.weight.medium,
+  },
+  ctaContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: colors.surface,
+    borderRadius: BORDER_RADIUS.md,
+    padding: SPACING.md,
+    gap: SPACING.sm,
+    borderLeftWidth: 3,
+    borderLeftColor: colors.warning,
+  },
+  ctaIcon: {
+    width: 28,
+    height: 28,
+    borderRadius: 14,
+    backgroundColor: colors.tintedWarning || 'rgba(251, 191, 36, 0.1)',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  ctaLabel: {
+    color: colors.warning,
+    fontSize: FONTS.size.xsmall,
+    fontWeight: FONTS.weight.bold,
+    textTransform: 'uppercase',
+  },
+  ctaText: {
+    color: colors.textPrimary,
+    fontSize: FONTS.size.small,
+    fontWeight: FONTS.weight.semibold,
+    flex: 1,
   },
   progressBar: {
     flexDirection: 'row',

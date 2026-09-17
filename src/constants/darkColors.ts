@@ -32,6 +32,7 @@ export const darkColors = {
   tintedError: 'rgba(239, 68, 68, 0.1)',
   tintedAccent: 'rgba(233, 69, 96, 0.1)',
   tintedInfo: 'rgba(0, 188, 212, 0.1)',
+  tintedWarning: 'rgba(251, 191, 36, 0.1)',
 
   // Gradientes
   gradientStart: '#1a1a2e',

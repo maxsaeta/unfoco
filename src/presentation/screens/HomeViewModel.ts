@@ -1,7 +1,14 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { container } from '../../di/container';
-import { Task, TimerSettings } from '../../domain/types';
+import { Task, TimerSettings, DailyPriorities } from '../../domain/types';
 import { auth } from '../../config/firebase';
+
+export type CelebrationType = 'step' | 'task' | null;
+
+const getTodayKey = (): string => {
+  const now = new Date();
+  return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+};
 
 export interface HomeState {
   tasks: Task[];
@@ -16,7 +23,11 @@ export interface HomeState {
   showPrivacyModal: boolean;
   showDeleteAccountModal: boolean;
   showReportAIModal: boolean;
+  showBrainDump: boolean;
+  showShutdownRitual: boolean;
+  showMoodTracker: boolean;
   taskToEdit: Task | null;
+  dailyPriorities: DailyPriorities | null;
 }
 
 export function useHomeViewModel() {
@@ -33,15 +44,49 @@ export function useHomeViewModel() {
     showPrivacyModal: false,
     showDeleteAccountModal: false,
     showReportAIModal: false,
+    showBrainDump: false,
+    showShutdownRitual: false,
+    showMoodTracker: false,
     taskToEdit: null,
+    dailyPriorities: null,
   });
 
-  const activeTasks = state.tasks.filter(task => !task.completed);
+  // Ordenar tareas: prioridades primero, luego el resto
+  const activeTasks = useMemo(() => {
+    const incomplete = state.tasks.filter(task => !task.completed);
+    
+    if (!state.dailyPriorities) return incomplete;
+    
+    const { taskIds } = state.dailyPriorities;
+    const prioritized: Task[] = [];
+    const rest: Task[] = [];
+    
+    // Primero las tareas con prioridad (en orden de prioridad)
+    for (const taskId of taskIds) {
+      if (taskId) {
+        const task = incomplete.find(t => t.id === taskId);
+        if (task) {
+          prioritized.push(task);
+        }
+      }
+    }
+    
+    // Luego el resto
+    for (const task of incomplete) {
+      if (!taskIds.includes(task.id!)) {
+        rest.push(task);
+      }
+    }
+    
+    return [...prioritized, ...rest];
+  }, [state.tasks, state.dailyPriorities]);
+
   const completedTasks = state.tasks.filter(task => task.completed);
   const currentTask = activeTasks.length > 0 ? activeTasks[state.currentTaskIndex] || null : null;
 
   useEffect(() => {
     loadSettings();
+    loadDailyPriorities();
     const userId = auth.currentUser?.uid;
     if (!userId) return;
 
@@ -58,6 +103,14 @@ export function useHomeViewModel() {
 
     const settings = await container.getTimerSettingsUseCase.execute(userId);
     setState(prev => ({ ...prev, timerSettings: settings }));
+  };
+
+  const loadDailyPriorities = async () => {
+    const userId = auth.currentUser?.uid;
+    if (!userId) return;
+
+    const priorities = await container.getDailyPrioritiesUseCase.execute(userId, getTodayKey());
+    setState(prev => ({ ...prev, dailyPriorities: priorities }));
   };
 
   const setCurrentTaskIndex = useCallback((index: number) => {
@@ -96,6 +149,18 @@ export function useHomeViewModel() {
     setState(prev => ({ ...prev, showReportAIModal: show }));
   }, []);
 
+  const setShowBrainDump = useCallback((show: boolean) => {
+    setState(prev => ({ ...prev, showBrainDump: show }));
+  }, []);
+
+  const setShowShutdownRitual = useCallback((show: boolean) => {
+    setState(prev => ({ ...prev, showShutdownRitual: show }));
+  }, []);
+
+  const setShowMoodTracker = useCallback((show: boolean) => {
+    setState(prev => ({ ...prev, showMoodTracker: show }));
+  }, []);
+
   const setTaskToEdit = useCallback((task: Task | null) => {
     setState(prev => ({ ...prev, taskToEdit: task }));
   }, []);
@@ -111,8 +176,8 @@ export function useHomeViewModel() {
     });
   };
 
-  const handleCompleteStep = async () => {
-    if (!currentTask) return;
+  const handleCompleteStep = async (): Promise<CelebrationType> => {
+    if (!currentTask) return null;
 
     const result = await container.completeStepUseCase.execute(
       currentTask.id!,
@@ -122,9 +187,10 @@ export function useHomeViewModel() {
 
     if (result.allCompleted) {
       await container.incrementTaskCompletedUseCase.execute(auth.currentUser?.uid || '');
+      return 'task';
     }
 
-    return result;
+    return 'step';
   };
 
   const handleDeleteTask = async (taskId: string) => {
@@ -152,6 +218,10 @@ export function useHomeViewModel() {
     await container.logoutUseCase.execute();
   };
 
+  const refreshDailyPriorities = useCallback(async () => {
+    await loadDailyPriorities();
+  }, []);
+
   return {
     state,
     activeTasks,
@@ -166,6 +236,9 @@ export function useHomeViewModel() {
     setShowPrivacyModal,
     setShowDeleteAccountModal,
     setShowReportAIModal,
+    setShowBrainDump,
+    setShowShutdownRitual,
+    setShowMoodTracker,
     setTaskToEdit,
     handleAddTask,
     handleStartTask,
@@ -173,5 +246,6 @@ export function useHomeViewModel() {
     handleDeleteTask,
     handleSettingsSave,
     handleLogout,
+    refreshDailyPriorities,
   };
 }

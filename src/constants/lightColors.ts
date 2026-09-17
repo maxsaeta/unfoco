@@ -32,6 +32,7 @@ export const lightColors = {
   tintedError: 'rgba(239, 68, 68, 0.08)',
   tintedAccent: 'rgba(233, 69, 96, 0.08)',
   tintedInfo: 'rgba(0, 188, 212, 0.08)',
+  tintedWarning: 'rgba(251, 191, 36, 0.08)',
 
   // Gradientes
   gradientStart: '#f5f5f7',

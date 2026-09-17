@@ -12,6 +12,7 @@ if (API_KEY) {
 export interface TaskStep {
   step: string;
   description: string;
+  estimatedMinutes: number;
 }
 
 // Generar pasos para una tarea usando IA
@@ -28,10 +29,12 @@ Tarea: "${taskTitle}"
 
 Genera entre 3 y 5 pasos concretos, pequeños y accionables para completar esta tarea. Cada paso debe ser específico y poder completarse en menos de 5 minutos.
 
+Incluye un tiempo estimado realista para cada paso en minutos (mínimo 1, máximo 15).
+
 Responde SOLO con un JSON válido en este formato exacto:
 [
-  {"step": "Nombre del paso", "description": "Descripción breve"},
-  {"step": "Nombre del paso", "description": "Descripción breve"}
+  {"step": "Nombre del paso", "description": "Descripción breve", "estimatedMinutes": 5},
+  {"step": "Nombre del paso", "description": "Descripción breve", "estimatedMinutes": 10}
 ]
 
 No incluyas texto adicional, solo el JSON.`;

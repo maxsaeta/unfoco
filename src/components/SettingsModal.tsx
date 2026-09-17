@@ -11,6 +11,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { SPACING, FONTS, BORDER_RADIUS, TOUCH_TARGETS } from '../constants/theme';
 import { Colors } from '../constants/theme';
 import { useTheme, ThemeMode } from '../context/ThemeContext';
+import { useLanguage, Language } from '../i18n';
 import { TimerSettings, getTimerSettings, saveTimerSettings } from '../services/settingsService';
 
 interface SettingsModalProps {
@@ -26,6 +27,7 @@ export function SettingsModal({ visible, onClose, onSave }: SettingsModalProps) 
   const [workMinutes, setWorkMinutes] = useState(25);
   const [breakMinutes, setBreakMinutes] = useState(5);
   const { colors, themeMode, setThemeMode } = useTheme();
+  const { language, setLanguage, t } = useLanguage();
   const styles = useStyles(colors);
 
   useEffect(() => {
@@ -52,7 +54,7 @@ export function SettingsModal({ visible, onClose, onSave }: SettingsModalProps) 
       <View style={styles.overlay}>
         <View style={styles.container}>
           <View style={styles.header}>
-            <Text style={styles.title}>Configurar Timer</Text>
+            <Text style={styles.title}>{t('settings.title')}</Text>
             <TouchableOpacity onPress={onClose} style={styles.closeButton}>
               <Ionicons name="close" size={24} color={colors.textSecondary} />
             </TouchableOpacity>
@@ -61,7 +63,7 @@ export function SettingsModal({ visible, onClose, onSave }: SettingsModalProps) 
           <ScrollView showsVerticalScrollIndicator={false}>
             {/* Work Duration */}
             <View style={styles.section}>
-              <Text style={styles.sectionTitle}>Tiempo de trabajo</Text>
+              <Text style={styles.sectionTitle}>{t('settings.workDuration')}</Text>
               <View style={styles.optionsRow}>
                 {WORK_OPTIONS.map((minutes) => (
                   <TouchableOpacity
@@ -85,7 +87,7 @@ export function SettingsModal({ visible, onClose, onSave }: SettingsModalProps) 
 
             {/* Break Duration */}
             <View style={styles.section}>
-              <Text style={styles.sectionTitle}>Tiempo de descanso</Text>
+              <Text style={styles.sectionTitle}>{t('settings.breakDuration')}</Text>
               <View style={styles.optionsRow}>
                 {BREAK_OPTIONS.map((minutes) => (
                   <TouchableOpacity
@@ -111,18 +113,18 @@ export function SettingsModal({ visible, onClose, onSave }: SettingsModalProps) 
             <View style={styles.preview}>
               <Ionicons name="time-outline" size={16} color={colors.textSecondary} />
               <Text style={styles.previewText}>
-                {workMinutes} min trabajo + {breakMinutes} min descanso
+                {t('settings.preview', { work: workMinutes, break: breakMinutes })}
               </Text>
             </View>
 
             {/* Theme Mode */}
             <View style={styles.section}>
-              <Text style={styles.sectionTitle}>Apariencia</Text>
+              <Text style={styles.sectionTitle}>{t('settings.appearance')}</Text>
               <View style={styles.optionsRow}>
                 {([
-                  { mode: 'system' as ThemeMode, label: 'Sistema', icon: 'phone-portrait-outline' },
-                  { mode: 'light' as ThemeMode, label: 'Claro', icon: 'sunny-outline' },
-                  { mode: 'dark' as ThemeMode, label: 'Oscuro', icon: 'moon-outline' },
+                  { mode: 'system' as ThemeMode, label: t('settings.system'), icon: 'phone-portrait-outline' },
+                  { mode: 'light' as ThemeMode, label: t('settings.light'), icon: 'sunny-outline' },
+                  { mode: 'dark' as ThemeMode, label: t('settings.dark'), icon: 'moon-outline' },
                 ]).map((option) => (
                   <TouchableOpacity
                     key={option.mode}
@@ -147,11 +149,43 @@ export function SettingsModal({ visible, onClose, onSave }: SettingsModalProps) 
                 ))}
               </View>
             </View>
+
+            {/* Language */}
+            <View style={styles.section}>
+              <Text style={styles.sectionTitle}>{t('settings.language')}</Text>
+              <View style={styles.optionsRow}>
+                {([
+                  { lang: 'es' as Language, label: t('settings.spanish'), icon: 'globe-outline' },
+                  { lang: 'en' as Language, label: t('settings.english'), icon: 'globe-outline' },
+                ]).map((option) => (
+                  <TouchableOpacity
+                    key={option.lang}
+                    style={[
+                      styles.option,
+                      language === option.lang && styles.optionActive,
+                    ]}
+                    onPress={() => setLanguage(option.lang)}
+                  >
+                    <Ionicons
+                      name={option.icon as any}
+                      size={18}
+                      color={language === option.lang ? colors.textPrimary : colors.textSecondary}
+                    />
+                    <Text style={[
+                      styles.optionText,
+                      language === option.lang && styles.optionTextActive,
+                    ]}>
+                      {option.label}
+                    </Text>
+                  </TouchableOpacity>
+                ))}
+              </View>
+            </View>
           </ScrollView>
 
           {/* Save Button */}
           <TouchableOpacity style={styles.saveButton} onPress={handleSave}>
-            <Text style={styles.saveButtonText}>Guardar</Text>
+            <Text style={styles.saveButtonText}>{t('common.save')}</Text>
           </TouchableOpacity>
         </View>
       </View>

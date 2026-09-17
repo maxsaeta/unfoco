@@ -1,0 +1,152 @@
+{
+  "app": {
+    "name": "NeuroPaso",
+    "tagline": "One step at a time"
+  },
+  "common": {
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "close": "Close",
+    "loading": "Loading...",
+    "back": "Back",
+    "next": "Next",
+    "done": "Done",
+    "yes": "Yes",
+    "no": "No"
+  },
+  "home": {
+    "title": "NeuroPaso",
+    "emptyTitle": "No tasks",
+    "emptySubtitle": "Tap + to add your first task",
+    "taskCounter": "Task {current} of {total}",
+    "priorities": "Priorities",
+    "mood": "Mood",
+    "closeDay": "End Day",
+    "history": "Task History",
+    "emptyHistory": "No completed tasks yet",
+    "stepsCompleted": "{count} steps completed",
+    "duration": "Duration: {duration}",
+    "startDate": "Started: {date}",
+    "endDate": "Ended: {date}",
+    "aiDisclosure": "Uses AI to generate task steps",
+    "report": "Report"
+  },
+  "timer": {
+    "start": "START",
+    "pause": "PAUSE",
+    "pauseBreak": "PAUSE BREAK",
+    "startBreak": "START BREAK",
+    "skipBreak": "Skip break",
+    "workComplete": "Pomodoro completed!",
+    "workCompleteMessage": "Take a {minutes} minute break. The timer will start automatically.",
+    "breakComplete": "Break finished!",
+    "breakCompleteMessage": "Ready for another Pomodoro?"
+  },
+  "task": {
+    "deleteTitle": "Delete task",
+    "deleteMessage": "Are you sure you want to delete \"{title}\"?",
+    "stepProgress": "Step {current} of {total}",
+    "nextAction": "Next action:",
+    "doubleTapHint": "Double tap for options",
+    "estimatedTime": "Estimated time: ~{minutes} min",
+    "totalEstimated": "Total estimated time: ~{minutes} min"
+  },
+  "priorities": {
+    "title": "🧠 Daily Priorities",
+    "subtitle": "Choose only 3 things. Less is more.",
+    "theThing": "THE Priority",
+    "theThingSubtitle": "If you do only one thing, do this",
+    "wouldBeNice": "Would Be Nice",
+    "wouldBeNiceSubtitle": "Important but not critical today",
+    "ifOnFire": "If I'm On Fire",
+    "ifOnFireSubtitle": "Only if you're crushing it",
+    "theThingPlaceholder": "What's your top priority today?",
+    "wouldBeNicePlaceholder": "What else would be nice to do?",
+    "ifOnFirePlaceholder": "Something extra if you have energy?",
+    "save": "Save Priorities",
+    "saved": "Saved!"
+  },
+  "mood": {
+    "title": "💚 How are you feeling?",
+    "subtitle": "There are no bad days, just different days. Your brain works differently and that's okay.",
+    "great": "Great",
+    "good": "Good",
+    "okay": "Okay",
+    "low": "Low",
+    "bad": "Bad",
+    "tipGreat": "Use this energy for THE important thing!",
+    "tipGood": "Great time to make progress!",
+    "tipOkay": "That's fine. Do what you can and rest.",
+    "tipLow": "Today is maintenance day: eat, hydrate, rest. Don't force it.",
+    "tipBad": "Just focus on the basics: eat, rest, be kind to yourself.",
+    "save": "Log mood",
+    "saved": "Saved!",
+    "historyTitle": "Last few days"
+  },
+  "shutdown": {
+    "title": "🌙 Shutdown Ritual",
+    "subtitle": "5 minutes to end the day calmly. Stop working.",
+    "writeTomorrow": "Write THE Priority for tomorrow",
+    "writeTomorrowPlaceholder": "What's your main task for tomorrow?",
+    "checkCalendar": "Check tomorrow's calendar",
+    "clearDesk": "Clear a desk/folder",
+    "sayDone": "Say out loud: Work is done for today",
+    "timeWrite": "~30 sec",
+    "timeCheck": "~30 sec",
+    "timeClear": "~2 min",
+    "timeSay": "~5 sec",
+    "save": "End the day",
+    "complete": "Complete the ritual",
+    "saved": "Rest well! 🌙"
+  },
+  "settings": {
+    "title": "Timer Settings",
+    "workDuration": "Work duration",
+    "breakDuration": "Break duration",
+    "preview": "{work} min work + {break} min break",
+    "appearance": "Appearance",
+    "language": "Language",
+    "system": "System",
+    "light": "Light",
+    "dark": "Dark",
+    "spanish": "Spanish",
+    "english": "English"
+  },
+  "stats": {
+    "title": "📊 Statistics",
+    "totalPomodoros": "Total Pomodoros",
+    "totalTasks": "Tasks completed",
+    "totalMinutes": "Minutes focused",
+    "streak": "Current streak",
+    "days": "days"
+  },
+  "privacy": {
+    "title": "Privacy Policy"
+  },
+  "deleteAccount": {
+    "title": "Delete Account",
+    "confirm": "Are you sure? This action cannot be undone."
+  },
+  "reportAI": {
+    "title": "Report AI Issue",
+    "placeholder": "Describe the problem with the AI response..."
+  },
+  "celebration": {
+    "stepComplete": "Step completed!",
+    "taskComplete": "Task completed!",
+    "greatWork": "Great work!",
+    "keepGoing": "Keep going!",
+    "halfway": "You're halfway there!"
+  },
+  "greeting": {
+    "morning": "Good morning",
+    "afternoon": "Good afternoon",
+    "evening": "Good evening"
+  },
+  "stateSummary": {
+    "inProgress": "You have {tasks} task(s) with {steps}/{total} steps completed",
+    "welcomeBack": "Welcome back!"
+  }
+}
