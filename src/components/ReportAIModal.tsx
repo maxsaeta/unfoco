@@ -10,7 +10,9 @@ import {
   ActivityIndicator
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { COLORS, SPACING, FONTS, BORDER_RADIUS, TOUCH_TARGETS } from '../constants/theme';
+import { SPACING, FONTS, BORDER_RADIUS, TOUCH_TARGETS } from '../constants/theme';
+import { useTheme } from '../context/ThemeContext';
+import { Colors } from '../constants/theme';
 
 interface ReportAIModalProps {
   visible: boolean;
@@ -21,6 +23,8 @@ interface ReportAIModalProps {
 export function ReportAIModal({ visible, onClose, reportedContent }: ReportAIModalProps) {
   const [reason, setReason] = useState('');
   const [loading, setLoading] = useState(false);
+  const { colors } = useTheme();
+  const styles = useStyles(colors);
 
   const reasons = [
     'Contenido ofensivo',
@@ -60,13 +64,13 @@ export function ReportAIModal({ visible, onClose, reportedContent }: ReportAIMod
         <View style={styles.header}>
           <Text style={styles.title}>Reportar Contenido IA</Text>
           <TouchableOpacity onPress={onClose} style={styles.closeButton}>
-            <Ionicons name="close" size={24} color={COLORS.textPrimary} />
+            <Ionicons name="close" size={24} color={colors.textPrimary} />
           </TouchableOpacity>
         </View>
 
         <View style={styles.content}>
           <View style={styles.infoBox}>
-            <Ionicons name="information-circle" size={24} color={COLORS.accent} />
+            <Ionicons name="information-circle" size={24} color={colors.accent} />
             <Text style={styles.infoText}>
               Si el contenido generado por la IA es ofensivo, inapropiado o contiene información falsa, por favor repórtalo para que podamos mejorar.
             </Text>
@@ -127,7 +131,7 @@ export function ReportAIModal({ visible, onClose, reportedContent }: ReportAIMod
               disabled={!reason || loading}
             >
               {loading ? (
-                <ActivityIndicator color={COLORS.textPrimary} />
+                <ActivityIndicator color={colors.textPrimary} />
               ) : (
                 <Text style={styles.reportButtonText}>Enviar Reporte</Text>
               )}
@@ -139,10 +143,10 @@ export function ReportAIModal({ visible, onClose, reportedContent }: ReportAIMod
   );
 }
 
-const styles = StyleSheet.create({
+const useStyles = (colors: Colors) => StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: COLORS.background,
+    backgroundColor: colors.background,
   },
   header: {
     flexDirection: 'row',
@@ -151,10 +155,10 @@ const styles = StyleSheet.create({
     paddingHorizontal: SPACING.lg,
     paddingVertical: SPACING.md,
     borderBottomWidth: 1,
-    borderBottomColor: COLORS.border,
+    borderBottomColor: colors.border,
   },
   title: {
-    color: COLORS.textPrimary,
+    color: colors.textPrimary,
     fontSize: FONTS.size.xlarge,
     fontWeight: FONTS.weight.bold,
   },
@@ -172,7 +176,7 @@ const styles = StyleSheet.create({
   },
   infoBox: {
     flexDirection: 'row',
-    backgroundColor: 'rgba(0, 188, 212, 0.1)',
+    backgroundColor: colors.tintedInfo,
     borderRadius: BORDER_RADIUS.md,
     padding: SPACING.md,
     marginBottom: SPACING.xl,
@@ -180,28 +184,28 @@ const styles = StyleSheet.create({
   },
   infoText: {
     flex: 1,
-    color: COLORS.textSecondary,
+    color: colors.textSecondary,
     fontSize: FONTS.size.medium,
     lineHeight: 20,
   },
   contentPreview: {
-    backgroundColor: COLORS.surface,
+    backgroundColor: colors.surface,
     borderRadius: BORDER_RADIUS.md,
     padding: SPACING.md,
     marginBottom: SPACING.xl,
   },
   contentLabel: {
-    color: COLORS.textMuted,
+    color: colors.textMuted,
     fontSize: FONTS.size.small,
     marginBottom: SPACING.sm,
   },
   contentText: {
-    color: COLORS.textSecondary,
+    color: colors.textSecondary,
     fontSize: FONTS.size.medium,
     fontStyle: 'italic',
   },
   sectionTitle: {
-    color: COLORS.textPrimary,
+    color: colors.textPrimary,
     fontSize: FONTS.size.large,
     fontWeight: FONTS.weight.semibold,
     marginBottom: SPACING.md,
@@ -213,42 +217,42 @@ const styles = StyleSheet.create({
   reasonItem: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: COLORS.surface,
+    backgroundColor: colors.surface,
     borderRadius: BORDER_RADIUS.md,
     padding: SPACING.md,
     gap: SPACING.sm,
     minHeight: TOUCH_TARGETS.minSize,
   },
   reasonItemActive: {
-    backgroundColor: 'rgba(233, 69, 96, 0.1)',
+    backgroundColor: colors.tintedAccent,
     borderWidth: 1,
-    borderColor: COLORS.error,
+    borderColor: colors.error,
   },
   radio: {
     width: 20,
     height: 20,
     borderRadius: 10,
     borderWidth: 2,
-    borderColor: COLORS.textMuted,
+    borderColor: colors.textMuted,
     alignItems: 'center',
     justifyContent: 'center',
   },
   radioActive: {
-    borderColor: COLORS.error,
+    borderColor: colors.error,
   },
   radioInner: {
     width: 10,
     height: 10,
     borderRadius: 5,
-    backgroundColor: COLORS.error,
+    backgroundColor: colors.error,
   },
   reasonText: {
-    color: COLORS.textSecondary,
+    color: colors.textSecondary,
     fontSize: FONTS.size.medium,
     flex: 1,
   },
   reasonTextActive: {
-    color: COLORS.textPrimary,
+    color: colors.textPrimary,
   },
   actions: {
     flexDirection: 'row',
@@ -258,23 +262,23 @@ const styles = StyleSheet.create({
   },
   cancelButton: {
     flex: 1,
-    backgroundColor: COLORS.surface,
+    backgroundColor: colors.surface,
     borderRadius: BORDER_RADIUS.md,
     padding: SPACING.lg,
     alignItems: 'center',
     justifyContent: 'center',
     minHeight: TOUCH_TARGETS.recommendedSize,
     borderWidth: 1,
-    borderColor: COLORS.border,
+    borderColor: colors.border,
   },
   cancelButtonText: {
-    color: COLORS.textSecondary,
+    color: colors.textSecondary,
     fontSize: FONTS.size.large,
     fontWeight: FONTS.weight.semibold,
   },
   reportButton: {
     flex: 1,
-    backgroundColor: COLORS.error,
+    backgroundColor: colors.error,
     borderRadius: BORDER_RADIUS.md,
     padding: SPACING.lg,
     alignItems: 'center',
@@ -285,7 +289,7 @@ const styles = StyleSheet.create({
     opacity: 0.5,
   },
   reportButtonText: {
-    color: COLORS.textPrimary,
+    color: colors.textPrimary,
     fontSize: FONTS.size.large,
     fontWeight: FONTS.weight.semibold,
   },

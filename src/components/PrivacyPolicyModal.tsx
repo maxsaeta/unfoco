@@ -9,7 +9,9 @@ import {
   Linking
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { COLORS, SPACING, FONTS, BORDER_RADIUS, TOUCH_TARGETS } from '../constants/theme';
+import { SPACING, FONTS, BORDER_RADIUS, TOUCH_TARGETS } from '../constants/theme';
+import { useTheme } from '../context/ThemeContext';
+import { Colors } from '../constants/theme';
 
 interface PrivacyPolicyModalProps {
   visible: boolean;
@@ -19,6 +21,9 @@ interface PrivacyPolicyModalProps {
 const PRIVACY_POLICY_URL = 'https://1paso.netlify.app/legal/privacy.html';
 
 export function PrivacyPolicyModal({ visible, onClose }: PrivacyPolicyModalProps) {
+  const { colors } = useTheme();
+  const styles = useStyles(colors);
+
   const handleOpenWebVersion = () => {
     Linking.openURL(PRIVACY_POLICY_URL);
   };
@@ -33,7 +38,7 @@ export function PrivacyPolicyModal({ visible, onClose }: PrivacyPolicyModalProps
         <View style={styles.header}>
           <Text style={styles.title}>Política de Privacidad</Text>
           <TouchableOpacity onPress={onClose} style={styles.closeButton}>
-            <Ionicons name="close" size={24} color={COLORS.textPrimary} />
+            <Ionicons name="close" size={24} color={colors.textPrimary} />
           </TouchableOpacity>
         </View>
 
@@ -163,7 +168,7 @@ export function PrivacyPolicyModal({ visible, onClose }: PrivacyPolicyModalProps
           </Text>
 
           <TouchableOpacity style={styles.webLinkButton} onPress={handleOpenWebVersion}>
-            <Ionicons name="open-outline" size={20} color={COLORS.accent} />
+            <Ionicons name="open-outline" size={20} color={colors.accent} />
             <Text style={styles.webLinkText}>Ver versión completa en web</Text>
           </TouchableOpacity>
 
@@ -174,10 +179,10 @@ export function PrivacyPolicyModal({ visible, onClose }: PrivacyPolicyModalProps
   );
 }
 
-const styles = StyleSheet.create({
+const useStyles = (colors: Colors) => StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: COLORS.background,
+    backgroundColor: colors.background,
   },
   header: {
     flexDirection: 'row',
@@ -186,10 +191,10 @@ const styles = StyleSheet.create({
     paddingHorizontal: SPACING.lg,
     paddingVertical: SPACING.md,
     borderBottomWidth: 1,
-    borderBottomColor: COLORS.border,
+    borderBottomColor: colors.border,
   },
   title: {
-    color: COLORS.textPrimary,
+    color: colors.textPrimary,
     fontSize: FONTS.size.xlarge,
     fontWeight: FONTS.weight.bold,
   },
@@ -206,26 +211,26 @@ const styles = StyleSheet.create({
     paddingTop: SPACING.md,
   },
   lastUpdated: {
-    color: COLORS.textMuted,
+    color: colors.textMuted,
     fontSize: FONTS.size.small,
     marginBottom: SPACING.xl,
   },
   sectionTitle: {
-    color: COLORS.textPrimary,
+    color: colors.textPrimary,
     fontSize: FONTS.size.large,
     fontWeight: FONTS.weight.bold,
     marginTop: SPACING.xl,
     marginBottom: SPACING.sm,
   },
   text: {
-    color: COLORS.textSecondary,
+    color: colors.textSecondary,
     fontSize: FONTS.size.medium,
     lineHeight: 22,
     marginBottom: SPACING.sm,
   },
   bold: {
     fontWeight: FONTS.weight.semibold,
-    color: COLORS.textPrimary,
+    color: colors.textPrimary,
   },
   webLinkButton: {
     flexDirection: 'row',
@@ -234,13 +239,13 @@ const styles = StyleSheet.create({
     gap: SPACING.sm,
     padding: SPACING.md,
     marginTop: SPACING.xl,
-    backgroundColor: COLORS.surface,
+    backgroundColor: colors.surface,
     borderRadius: BORDER_RADIUS.md,
     borderWidth: 1,
-    borderColor: COLORS.accent,
+    borderColor: colors.accent,
   },
   webLinkText: {
-    color: COLORS.accent,
+    color: colors.accent,
     fontSize: FONTS.size.medium,
     fontWeight: FONTS.weight.semibold,
   },

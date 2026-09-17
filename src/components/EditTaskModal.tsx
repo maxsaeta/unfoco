@@ -13,7 +13,8 @@ import {
   ActivityIndicator
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { COLORS, SPACING, FONTS } from '../constants/theme';
+import { SPACING, FONTS, Colors } from '../constants/theme';
+import { useTheme } from '../context/ThemeContext';
 import { Task, TaskStep } from '../domain/types';
 import { generateTaskSteps } from '../services/aiService';
 import { container } from '../di/container';
@@ -29,6 +30,9 @@ export function EditTaskModal({ visible, task, onClose, onUpdate }: EditTaskModa
   const [title, setTitle] = useState('');
   const [steps, setSteps] = useState<TaskStep[]>([]);
   const [loadingAI, setLoadingAI] = useState(false);
+
+  const { colors } = useTheme();
+  const styles = useStyles(colors);
 
   useEffect(() => {
     if (task) {
@@ -128,14 +132,14 @@ export function EditTaskModal({ visible, task, onClose, onUpdate }: EditTaskModa
           <View style={styles.modalHeader}>
             <Text style={styles.modalTitle}>Modificar Tarea</Text>
             <TouchableOpacity onPress={handleClose}>
-              <Ionicons name="close" size={24} color={COLORS.textSecondary} />
+              <Ionicons name="close" size={24} color={colors.textSecondary} />
             </TouchableOpacity>
           </View>
           
           <TextInput
             style={styles.input}
             placeholder="Nombre de la tarea"
-            placeholderTextColor={COLORS.textMuted}
+            placeholderTextColor={colors.textMuted}
             value={title}
             onChangeText={setTitle}
           />
@@ -147,9 +151,9 @@ export function EditTaskModal({ visible, task, onClose, onUpdate }: EditTaskModa
             disabled={loadingAI}
           >
             {loadingAI ? (
-              <ActivityIndicator color={COLORS.accent} size="small" />
+              <ActivityIndicator color={colors.accent} size="small" />
             ) : (
-              <Ionicons name="sparkles" size={20} color={COLORS.accent} />
+              <Ionicons name="sparkles" size={20} color={colors.accent} />
             )}
             <Text style={styles.aiButtonText}>
               {loadingAI ? 'Generando...' : 'Regenerar pasos con IA'}
@@ -160,7 +164,7 @@ export function EditTaskModal({ visible, task, onClose, onUpdate }: EditTaskModa
           <View style={styles.stepsHeader}>
             <Text style={styles.stepsTitle}>Pasos ({steps.length})</Text>
             <TouchableOpacity onPress={handleAddStep}>
-              <Ionicons name="add-circle" size={24} color={COLORS.accent} />
+              <Ionicons name="add-circle" size={24} color={colors.accent} />
             </TouchableOpacity>
           </View>
 
@@ -174,20 +178,20 @@ export function EditTaskModal({ visible, task, onClose, onUpdate }: EditTaskModa
                   <TextInput
                     style={styles.stepInput}
                     placeholder="Título del paso"
-                    placeholderTextColor={COLORS.textMuted}
+                    placeholderTextColor={colors.textMuted}
                     value={step.title}
                     onChangeText={(value) => handleUpdateStep(index, 'title', value)}
                   />
                   <TextInput
                     style={styles.stepInputDescription}
                     placeholder="Descripción (opcional)"
-                    placeholderTextColor={COLORS.textMuted}
+                    placeholderTextColor={colors.textMuted}
                     value={step.description}
                     onChangeText={(value) => handleUpdateStep(index, 'description', value)}
                   />
                 </View>
                 <TouchableOpacity onPress={() => handleRemoveStep(index)}>
-                  <Ionicons name="close-circle" size={20} color={COLORS.error} />
+                  <Ionicons name="close-circle" size={20} color={colors.error} />
                 </TouchableOpacity>
               </View>
             ))}
@@ -198,7 +202,7 @@ export function EditTaskModal({ visible, task, onClose, onUpdate }: EditTaskModa
               <Text style={styles.buttonCancelText}>Cancelar</Text>
             </TouchableOpacity>
             <TouchableOpacity style={styles.buttonSave} onPress={handleUpdate}>
-              <Ionicons name="checkmark-circle" size={20} color={COLORS.textPrimary} />
+              <Ionicons name="checkmark-circle" size={20} color={colors.textPrimary} />
               <Text style={styles.buttonSaveText}>Guardar</Text>
             </TouchableOpacity>
           </View>
@@ -208,15 +212,15 @@ export function EditTaskModal({ visible, task, onClose, onUpdate }: EditTaskModa
   );
 }
 
-const styles = StyleSheet.create({
+const useStyles = (colors: Colors) => StyleSheet.create({
   overlay: {
     flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.7)',
+    backgroundColor: colors.overlay,
     justifyContent: 'center',
     paddingHorizontal: SPACING.lg,
   },
   modal: {
-    backgroundColor: COLORS.surface,
+    backgroundColor: colors.surface,
     borderRadius: 20,
     padding: SPACING.lg,
     maxHeight: '85%',
@@ -228,19 +232,19 @@ const styles = StyleSheet.create({
     marginBottom: SPACING.lg,
   },
   modalTitle: {
-    color: COLORS.textPrimary,
+    color: colors.textPrimary,
     fontSize: FONTS.size.large,
     fontWeight: 'bold',
   },
   input: {
-    backgroundColor: COLORS.background,
+    backgroundColor: colors.background,
     borderRadius: 12,
     padding: SPACING.md,
-    color: COLORS.textPrimary,
+    color: colors.textPrimary,
     fontSize: FONTS.size.medium,
     marginBottom: SPACING.md,
     borderWidth: 1,
-    borderColor: COLORS.primary,
+    borderColor: colors.primary,
   },
   aiButton: {
     flexDirection: 'row',
@@ -251,15 +255,15 @@ const styles = StyleSheet.create({
     paddingHorizontal: SPACING.lg,
     borderRadius: 12,
     borderWidth: 1,
-    borderColor: COLORS.accent,
-    backgroundColor: 'transparent',
+    borderColor: colors.accent,
+    backgroundColor: colors.transparent,
     marginBottom: SPACING.md,
   },
   aiButtonDisabled: {
     opacity: 0.6,
   },
   aiButtonText: {
-    color: COLORS.accent,
+    color: colors.accent,
     fontSize: FONTS.size.small,
     fontWeight: '600',
   },
@@ -270,7 +274,7 @@ const styles = StyleSheet.create({
     marginBottom: SPACING.sm,
   },
   stepsTitle: {
-    color: COLORS.textSecondary,
+    color: colors.textSecondary,
     fontSize: FONTS.size.small,
   },
   stepsList: {
@@ -287,12 +291,12 @@ const styles = StyleSheet.create({
     width: 24,
     height: 24,
     borderRadius: 12,
-    backgroundColor: COLORS.accent,
+    backgroundColor: colors.accent,
     alignItems: 'center',
     justifyContent: 'center',
   },
   stepNumberText: {
-    color: COLORS.textPrimary,
+    color: colors.textPrimary,
     fontSize: 12,
     fontWeight: 'bold',
   },
@@ -301,17 +305,17 @@ const styles = StyleSheet.create({
     gap: SPACING.xs,
   },
   stepInput: {
-    backgroundColor: COLORS.background,
+    backgroundColor: colors.background,
     borderRadius: 8,
     padding: SPACING.sm,
-    color: COLORS.textPrimary,
+    color: colors.textPrimary,
     fontSize: FONTS.size.small,
   },
   stepInputDescription: {
-    backgroundColor: COLORS.background,
+    backgroundColor: colors.background,
     borderRadius: 8,
     padding: SPACING.sm,
-    color: COLORS.textSecondary,
+    color: colors.textSecondary,
     fontSize: 12,
   },
   buttons: {
@@ -324,10 +328,10 @@ const styles = StyleSheet.create({
     paddingVertical: SPACING.md,
     borderRadius: 12,
     alignItems: 'center',
-    backgroundColor: COLORS.background,
+    backgroundColor: colors.background,
   },
   buttonCancelText: {
-    color: COLORS.textSecondary,
+    color: colors.textSecondary,
     fontSize: FONTS.size.medium,
     fontWeight: '600',
   },
@@ -339,10 +343,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     gap: SPACING.sm,
-    backgroundColor: COLORS.accent,
+    backgroundColor: colors.accent,
   },
   buttonSaveText: {
-    color: COLORS.textPrimary,
+    color: colors.textPrimary,
     fontSize: FONTS.size.medium,
     fontWeight: '600',
   },

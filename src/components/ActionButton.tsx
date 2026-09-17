@@ -1,6 +1,8 @@
 import React from 'react';
 import { TouchableOpacity, Text, StyleSheet, ViewStyle } from 'react-native';
-import { COLORS, SPACING, FONTS } from '../constants/theme';
+import { SPACING, FONTS } from '../constants/theme';
+import { useTheme } from '../context/ThemeContext';
+import { Colors } from '../constants/theme';
 
 interface ActionButtonProps {
   title: string;
@@ -15,6 +17,9 @@ export function ActionButton({
   variant = 'primary',
   style 
 }: ActionButtonProps) {
+  const { colors } = useTheme();
+  const styles = useStyles(colors);
+
   const getButtonStyle = () => {
     switch (variant) {
       case 'secondary':
@@ -48,7 +53,7 @@ export function ActionButton({
   );
 }
 
-const styles = StyleSheet.create({
+const useStyles = (colors: Colors) => StyleSheet.create({
   button: {
     paddingVertical: SPACING.sm,
     paddingHorizontal: SPACING.lg,
@@ -57,27 +62,27 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   buttonPrimary: {
-    backgroundColor: COLORS.accent,
+    backgroundColor: colors.accent,
   },
   buttonSecondary: {
-    backgroundColor: 'transparent',
+    backgroundColor: colors.transparent,
     borderWidth: 2,
-    borderColor: COLORS.textSecondary,
+    borderColor: colors.textSecondary,
   },
   buttonDanger: {
-    backgroundColor: COLORS.error,
+    backgroundColor: colors.error,
   },
   text: {
     fontSize: FONTS.size.small,
     fontWeight: '600',
   },
   textPrimary: {
-    color: COLORS.textPrimary,
+    color: colors.textPrimary,
   },
   textSecondary: {
-    color: COLORS.textSecondary,
+    color: colors.textSecondary,
   },
   textDanger: {
-    color: COLORS.textPrimary,
+    color: colors.textPrimary,
   },
 });

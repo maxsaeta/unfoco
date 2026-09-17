@@ -10,7 +10,9 @@ import {
   TextInput
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { COLORS, SPACING, FONTS, BORDER_RADIUS, TOUCH_TARGETS } from '../constants/theme';
+import { SPACING, FONTS, BORDER_RADIUS, TOUCH_TARGETS } from '../constants/theme';
+import { Colors } from '../constants/theme';
+import { useTheme } from '../context/ThemeContext';
 import { container } from '../di/container';
 import { auth } from '../config/firebase';
 
@@ -22,6 +24,9 @@ interface DeleteAccountModalProps {
 export function DeleteAccountModal({ visible, onClose }: DeleteAccountModalProps) {
   const [loading, setLoading] = useState(false);
   const [confirmText, setConfirmText] = useState('');
+
+  const { colors } = useTheme();
+  const styles = useStyles(colors);
 
   const handleDelete = async () => {
     if (confirmText !== 'ELIMINAR') {
@@ -76,13 +81,13 @@ export function DeleteAccountModal({ visible, onClose }: DeleteAccountModalProps
         <View style={styles.header}>
           <Text style={styles.title}>Eliminar Cuenta</Text>
           <TouchableOpacity onPress={onClose} style={styles.closeButton}>
-            <Ionicons name="close" size={24} color={COLORS.textPrimary} />
+            <Ionicons name="close" size={24} color={colors.textPrimary} />
           </TouchableOpacity>
         </View>
 
         <View style={styles.content}>
           <View style={styles.warningIcon}>
-            <Ionicons name="warning" size={64} color={COLORS.error} />
+            <Ionicons name="warning" size={64} color={colors.error} />
           </View>
 
           <Text style={styles.warningTitle}>¿Estás seguro?</Text>
@@ -93,19 +98,19 @@ export function DeleteAccountModal({ visible, onClose }: DeleteAccountModalProps
 
           <View style={styles.dataList}>
             <View style={styles.dataItem}>
-              <Ionicons name="mail-outline" size={20} color={COLORS.error} />
+              <Ionicons name="mail-outline" size={20} color={colors.error} />
               <Text style={styles.dataItemText}>Tu cuenta de correo electrónico</Text>
             </View>
             <View style={styles.dataItem}>
-              <Ionicons name="list-outline" size={20} color={COLORS.error} />
+              <Ionicons name="list-outline" size={20} color={colors.error} />
               <Text style={styles.dataItemText}>Todas tus tareas y pasos</Text>
             </View>
             <View style={styles.dataItem}>
-              <Ionicons name="stats-chart-outline" size={20} color={COLORS.error} />
+              <Ionicons name="stats-chart-outline" size={20} color={colors.error} />
               <Text style={styles.dataItemText}>Tus estadísticas de productividad</Text>
             </View>
             <View style={styles.dataItem}>
-              <Ionicons name="settings-outline" size={20} color={COLORS.error} />
+              <Ionicons name="settings-outline" size={20} color={colors.error} />
               <Text style={styles.dataItemText}>Tu configuración de temporizador</Text>
             </View>
           </View>
@@ -123,7 +128,7 @@ export function DeleteAccountModal({ visible, onClose }: DeleteAccountModalProps
             value={confirmText}
             onChangeText={setConfirmText}
             placeholder="ELIMINAR"
-            placeholderTextColor={COLORS.textMuted}
+            placeholderTextColor={colors.textMuted}
             autoCapitalize="characters"
             autoCorrect={false}
           />
@@ -146,7 +151,7 @@ export function DeleteAccountModal({ visible, onClose }: DeleteAccountModalProps
               disabled={confirmText !== 'ELIMINAR' || loading}
             >
               {loading ? (
-                <ActivityIndicator color={COLORS.textPrimary} />
+                <ActivityIndicator color={colors.textPrimary} />
               ) : (
                 <Text style={styles.deleteButtonText}>Eliminar Cuenta</Text>
               )}
@@ -158,10 +163,10 @@ export function DeleteAccountModal({ visible, onClose }: DeleteAccountModalProps
   );
 }
 
-const styles = StyleSheet.create({
+const useStyles = (colors: Colors) => StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: COLORS.background,
+    backgroundColor: colors.background,
   },
   header: {
     flexDirection: 'row',
@@ -170,10 +175,10 @@ const styles = StyleSheet.create({
     paddingHorizontal: SPACING.lg,
     paddingVertical: SPACING.md,
     borderBottomWidth: 1,
-    borderBottomColor: COLORS.border,
+    borderBottomColor: colors.border,
   },
   title: {
-    color: COLORS.textPrimary,
+    color: colors.textPrimary,
     fontSize: FONTS.size.xlarge,
     fontWeight: FONTS.weight.bold,
   },
@@ -194,20 +199,20 @@ const styles = StyleSheet.create({
     marginBottom: SPACING.lg,
   },
   warningTitle: {
-    color: COLORS.error,
+    color: colors.error,
     fontSize: FONTS.size.xxlarge,
     fontWeight: FONTS.weight.bold,
     textAlign: 'center',
     marginBottom: SPACING.md,
   },
   description: {
-    color: COLORS.textSecondary,
+    color: colors.textSecondary,
     fontSize: FONTS.size.medium,
     textAlign: 'center',
     marginBottom: SPACING.xl,
   },
   dataList: {
-    backgroundColor: COLORS.surface,
+    backgroundColor: colors.surface,
     borderRadius: BORDER_RADIUS.md,
     padding: SPACING.md,
     marginBottom: SPACING.xl,
@@ -219,39 +224,39 @@ const styles = StyleSheet.create({
     paddingVertical: SPACING.sm,
   },
   dataItemText: {
-    color: COLORS.textSecondary,
+    color: colors.textSecondary,
     fontSize: FONTS.size.medium,
     flex: 1,
   },
   irreversible: {
-    color: COLORS.error,
+    color: colors.error,
     fontSize: FONTS.size.medium,
     fontWeight: FONTS.weight.semibold,
     textAlign: 'center',
     marginBottom: SPACING.xl,
     padding: SPACING.md,
-    backgroundColor: 'rgba(233, 69, 96, 0.1)',
+    backgroundColor: colors.tintedAccent,
     borderRadius: BORDER_RADIUS.md,
   },
   confirmLabel: {
-    color: COLORS.textSecondary,
+    color: colors.textSecondary,
     fontSize: FONTS.size.medium,
     marginBottom: SPACING.sm,
   },
   bold: {
     fontWeight: FONTS.weight.bold,
-    color: COLORS.textPrimary,
+    color: colors.textPrimary,
   },
   confirmInput: {
-    backgroundColor: COLORS.surface,
+    backgroundColor: colors.surface,
     borderRadius: BORDER_RADIUS.md,
     padding: SPACING.lg,
-    color: COLORS.textPrimary,
+    color: colors.textPrimary,
     fontSize: FONTS.size.large,
     fontWeight: FONTS.weight.bold,
     textAlign: 'center',
     borderWidth: 2,
-    borderColor: COLORS.border,
+    borderColor: colors.border,
     marginBottom: SPACING.xl,
     minHeight: TOUCH_TARGETS.recommendedSize,
   },
@@ -261,23 +266,23 @@ const styles = StyleSheet.create({
   },
   cancelButton: {
     flex: 1,
-    backgroundColor: COLORS.surface,
+    backgroundColor: colors.surface,
     borderRadius: BORDER_RADIUS.md,
     padding: SPACING.lg,
     alignItems: 'center',
     justifyContent: 'center',
     minHeight: TOUCH_TARGETS.recommendedSize,
     borderWidth: 1,
-    borderColor: COLORS.border,
+    borderColor: colors.border,
   },
   cancelButtonText: {
-    color: COLORS.textSecondary,
+    color: colors.textSecondary,
     fontSize: FONTS.size.large,
     fontWeight: FONTS.weight.semibold,
   },
   deleteButton: {
     flex: 1,
-    backgroundColor: COLORS.error,
+    backgroundColor: colors.error,
     borderRadius: BORDER_RADIUS.md,
     padding: SPACING.lg,
     alignItems: 'center',
@@ -288,7 +293,7 @@ const styles = StyleSheet.create({
     opacity: 0.5,
   },
   deleteButtonText: {
-    color: COLORS.textPrimary,
+    color: colors.textPrimary,
     fontSize: FONTS.size.large,
     fontWeight: FONTS.weight.semibold,
   },

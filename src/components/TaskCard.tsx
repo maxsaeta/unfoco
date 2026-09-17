@@ -1,6 +1,8 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
-import { COLORS, SPACING, FONTS } from '../constants/theme';
+import { SPACING, FONTS } from '../constants/theme';
+import { useTheme } from '../context/ThemeContext';
+import { Colors } from '../constants/theme';
 
 interface TaskCardProps {
   title: string;
@@ -9,6 +11,9 @@ interface TaskCardProps {
 }
 
 export function TaskCard({ title, subtitle, isActive = true }: TaskCardProps) {
+  const { colors } = useTheme();
+  const styles = useStyles(colors);
+
   return (
     <View style={[styles.card, isActive && styles.cardActive]}>
       <Text style={styles.label}>TU TAREA AHORA</Text>
@@ -18,9 +23,9 @@ export function TaskCard({ title, subtitle, isActive = true }: TaskCardProps) {
   );
 }
 
-const styles = StyleSheet.create({
+const useStyles = (colors: Colors) => StyleSheet.create({
   card: {
-    backgroundColor: COLORS.surface,
+    backgroundColor: colors.surface,
     borderRadius: 20,
     padding: SPACING.xl,
     marginHorizontal: SPACING.md,
@@ -30,23 +35,23 @@ const styles = StyleSheet.create({
   },
   cardActive: {
     borderWidth: 2,
-    borderColor: COLORS.accent,
+    borderColor: colors.accent,
   },
   label: {
-    color: COLORS.textSecondary,
+    color: colors.textSecondary,
     fontSize: FONTS.size.small,
     letterSpacing: 2,
     marginBottom: SPACING.md,
   },
   title: {
-    color: COLORS.textPrimary,
+    color: colors.textPrimary,
     fontSize: FONTS.size.xlarge,
     fontWeight: 'bold',
     textAlign: 'center',
     lineHeight: 40,
   },
   subtitle: {
-    color: COLORS.textSecondary,
+    color: colors.textSecondary,
     fontSize: FONTS.size.medium,
     marginTop: SPACING.md,
     textAlign: 'center',

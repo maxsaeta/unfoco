@@ -13,7 +13,9 @@ import {
   ScrollView
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { COLORS, SPACING, FONTS, BORDER_RADIUS, TOUCH_TARGETS } from '../constants/theme';
+import { SPACING, FONTS, BORDER_RADIUS, TOUCH_TARGETS } from '../constants/theme';
+import { Colors } from '../constants/theme';
+import { useTheme } from '../context/ThemeContext';
 import { Task } from '../domain/types';
 
 interface SwipeableTaskProps {
@@ -49,6 +51,9 @@ export function SwipeableTask({
   const taskRef = useRef(task);
   const callbacksRef = useRef({ onSwipeLeft, onSwipeRight, onDelete, onEdit });
   
+  const { colors } = useTheme();
+  const styles = useStyles(colors);
+
   taskRef.current = task;
   callbacksRef.current = { onSwipeLeft, onSwipeRight, onDelete, onEdit };
 
@@ -174,9 +179,9 @@ export function SwipeableTask({
       </View>
 
       <View style={styles.swipeIndicator}>
-        <Ionicons name="chevron-back" size={16} color={COLORS.textMuted} />
+        <Ionicons name="chevron-back" size={16} color={colors.textMuted} />
         <Text style={styles.swipeText}>Doble clic para opciones</Text>
-        <Ionicons name="chevron-forward" size={16} color={COLORS.textMuted} />
+        <Ionicons name="chevron-forward" size={16} color={colors.textMuted} />
       </View>
     </>
   );
@@ -194,7 +199,7 @@ export function SwipeableTask({
             <Ionicons 
               name="chevron-back-circle" 
               size={40} 
-              color={canGoPrevious ? COLORS.accent : COLORS.textMuted} 
+              color={canGoPrevious ? colors.accent : colors.textMuted} 
             />
           </TouchableOpacity>
         )}
@@ -233,7 +238,7 @@ export function SwipeableTask({
             <Ionicons 
               name="chevron-forward-circle" 
               size={40} 
-              color={canGoNext ? COLORS.accent : COLORS.textMuted} 
+              color={canGoNext ? colors.accent : colors.textMuted} 
             />
           </TouchableOpacity>
         )}
@@ -250,12 +255,12 @@ export function SwipeableTask({
             <Text style={styles.menuTitle}>{task.title}</Text>
             
             <TouchableOpacity style={styles.menuItem} onPress={handleEdit}>
-              <Ionicons name="create-outline" size={24} color={COLORS.accent} />
+              <Ionicons name="create-outline" size={24} color={colors.accent} />
               <Text style={styles.menuItemText}>Modificar tarea</Text>
             </TouchableOpacity>
 
             <TouchableOpacity style={[styles.menuItem, styles.menuItemDanger]} onPress={handleDelete}>
-              <Ionicons name="trash-outline" size={24} color={COLORS.error} />
+              <Ionicons name="trash-outline" size={24} color={colors.error} />
               <Text style={[styles.menuItemText, styles.menuItemTextDanger]}>Eliminar tarea</Text>
             </TouchableOpacity>
 
@@ -272,7 +277,7 @@ export function SwipeableTask({
   );
 }
 
-const styles = StyleSheet.create({
+const useStyles = (colors: Colors) => StyleSheet.create({
   containerWithArrows: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -302,14 +307,14 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   taskTitle: {
-    color: COLORS.textPrimary,
+    color: colors.textPrimary,
     fontSize: FONTS.size.xlarge,
     fontWeight: FONTS.weight.bold,
     textAlign: 'center',
     marginBottom: SPACING.xs,
   },
   taskProgress: {
-    color: COLORS.textSecondary,
+    color: colors.textSecondary,
     fontSize: FONTS.size.small,
   },
   stepScroll: {
@@ -317,23 +322,23 @@ const styles = StyleSheet.create({
   },
   stepCard: {
     flexDirection: 'row',
-    backgroundColor: COLORS.surface,
+    backgroundColor: colors.surface,
     borderRadius: BORDER_RADIUS.lg,
     padding: SPACING.lg,
     gap: SPACING.md,
     borderWidth: 1,
-    borderColor: COLORS.border,
+    borderColor: colors.border,
   },
   stepIndicator: {
     width: 48,
     height: 48,
     borderRadius: 24,
-    backgroundColor: COLORS.accent,
+    backgroundColor: colors.accent,
     alignItems: 'center',
     justifyContent: 'center',
   },
   stepNumber: {
-    color: COLORS.textPrimary,
+    color: colors.textPrimary,
     fontSize: FONTS.size.large,
     fontWeight: FONTS.weight.bold,
   },
@@ -342,13 +347,13 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   stepTitle: {
-    color: COLORS.textPrimary,
+    color: colors.textPrimary,
     fontSize: FONTS.size.large,
     fontWeight: FONTS.weight.semibold,
     marginBottom: SPACING.xs,
   },
   stepDescription: {
-    color: COLORS.textSecondary,
+    color: colors.textSecondary,
     fontSize: FONTS.size.small,
     lineHeight: 20,
   },
@@ -361,13 +366,13 @@ const styles = StyleSheet.create({
     width: 10,
     height: 10,
     borderRadius: 5,
-    backgroundColor: COLORS.textMuted,
+    backgroundColor: colors.textMuted,
   },
   progressDotCompleted: {
-    backgroundColor: COLORS.success,
+    backgroundColor: colors.success,
   },
   progressDotActive: {
-    backgroundColor: COLORS.accent,
+    backgroundColor: colors.accent,
     width: 28,
   },
   swipeIndicator: {
@@ -378,24 +383,24 @@ const styles = StyleSheet.create({
     marginTop: SPACING.sm,
   },
   swipeText: {
-    color: COLORS.textMuted,
+    color: colors.textMuted,
     fontSize: FONTS.size.xs,
   },
   menuOverlay: {
     flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.6)',
+    backgroundColor: colors.overlay,
     justifyContent: 'center',
     alignItems: 'center',
   },
   menuContainer: {
-    backgroundColor: COLORS.surface,
+    backgroundColor: colors.surface,
     borderRadius: BORDER_RADIUS.xl,
     padding: SPACING.xl,
     width: '85%',
     maxWidth: 320,
   },
   menuTitle: {
-    color: COLORS.textPrimary,
+    color: colors.textPrimary,
     fontSize: FONTS.size.large,
     fontWeight: FONTS.weight.bold,
     textAlign: 'center',
@@ -408,20 +413,20 @@ const styles = StyleSheet.create({
     paddingVertical: SPACING.md,
     paddingHorizontal: SPACING.lg,
     borderRadius: BORDER_RADIUS.md,
-    backgroundColor: COLORS.background,
+    backgroundColor: colors.background,
     marginBottom: SPACING.md,
     minHeight: TOUCH_TARGETS.minSize,
   },
   menuItemDanger: {
-    backgroundColor: 'rgba(239, 68, 68, 0.1)',
+    backgroundColor: colors.tintedError,
   },
   menuItemText: {
-    color: COLORS.textPrimary,
+    color: colors.textPrimary,
     fontSize: FONTS.size.medium,
     fontWeight: FONTS.weight.medium,
   },
   menuItemTextDanger: {
-    color: COLORS.error,
+    color: colors.error,
   },
   menuCancelButton: {
     paddingVertical: SPACING.md,
@@ -429,7 +434,7 @@ const styles = StyleSheet.create({
     minHeight: TOUCH_TARGETS.minSize,
   },
   menuCancelText: {
-    color: COLORS.textSecondary,
+    color: colors.textSecondary,
     fontSize: FONTS.size.medium,
   },
 });

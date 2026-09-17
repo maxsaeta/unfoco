@@ -8,7 +8,9 @@ import {
   Alert,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { COLORS, SPACING, FONTS, BORDER_RADIUS, TOUCH_TARGETS } from '../constants/theme';
+import { SPACING, FONTS, BORDER_RADIUS, TOUCH_TARGETS } from '../constants/theme';
+import { Colors } from '../constants/theme';
+import { useTheme, ThemeMode } from '../context/ThemeContext';
 import { TimerSettings, getTimerSettings, saveTimerSettings } from '../services/settingsService';
 
 interface SettingsModalProps {
@@ -23,6 +25,8 @@ const BREAK_OPTIONS = [3, 5, 10];
 export function SettingsModal({ visible, onClose, onSave }: SettingsModalProps) {
   const [workMinutes, setWorkMinutes] = useState(25);
   const [breakMinutes, setBreakMinutes] = useState(5);
+  const { colors, themeMode, setThemeMode } = useTheme();
+  const styles = useStyles(colors);
 
   useEffect(() => {
     if (visible) {
@@ -50,7 +54,7 @@ export function SettingsModal({ visible, onClose, onSave }: SettingsModalProps) 
           <View style={styles.header}>
             <Text style={styles.title}>Configurar Timer</Text>
             <TouchableOpacity onPress={onClose} style={styles.closeButton}>
-              <Ionicons name="close" size={24} color={COLORS.textSecondary} />
+              <Ionicons name="close" size={24} color={colors.textSecondary} />
             </TouchableOpacity>
           </View>
 
@@ -104,9 +108,43 @@ export function SettingsModal({ visible, onClose, onSave }: SettingsModalProps) 
             </View>
           </View>
 
+          {/* Theme Mode */}
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>Apariencia</Text>
+            <Text style={styles.sectionSubtitle}>Selecciona el tema de la aplicación</Text>
+            <View style={styles.optionsRow}>
+              {([
+                { mode: 'system' as ThemeMode, label: 'Sistema', icon: 'phone-portrait-outline' },
+                { mode: 'light' as ThemeMode, label: 'Claro', icon: 'sunny-outline' },
+                { mode: 'dark' as ThemeMode, label: 'Oscuro', icon: 'moon-outline' },
+              ]).map((option) => (
+                <TouchableOpacity
+                  key={option.mode}
+                  style={[
+                    styles.option,
+                    themeMode === option.mode && styles.optionActive,
+                  ]}
+                  onPress={() => setThemeMode(option.mode)}
+                >
+                  <Ionicons
+                    name={option.icon as any}
+                    size={20}
+                    color={themeMode === option.mode ? colors.textPrimary : colors.textSecondary}
+                  />
+                  <Text style={[
+                    styles.optionText,
+                    themeMode === option.mode && styles.optionTextActive,
+                  ]}>
+                    {option.label}
+                  </Text>
+                </TouchableOpacity>
+              ))}
+            </View>
+          </View>
+
           {/* Preview */}
           <View style={styles.preview}>
-            <Ionicons name="time-outline" size={20} color={COLORS.textSecondary} />
+            <Ionicons name="time-outline" size={20} color={colors.textSecondary} />
             <Text style={styles.previewText}>
               Ciclo: {workMinutes} min trabajo + {breakMinutes} min descanso
             </Text>
@@ -122,16 +160,16 @@ export function SettingsModal({ visible, onClose, onSave }: SettingsModalProps) 
   );
 }
 
-const styles = StyleSheet.create({
+const useStyles = (colors: Colors) => StyleSheet.create({
   overlay: {
     flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.7)',
+    backgroundColor: colors.overlay,
     justifyContent: 'center',
     alignItems: 'center',
     padding: SPACING.lg,
   },
   container: {
-    backgroundColor: COLORS.surface,
+    backgroundColor: colors.surface,
     borderRadius: BORDER_RADIUS.xl,
     padding: SPACING.xl,
     width: '100%',
@@ -144,7 +182,7 @@ const styles = StyleSheet.create({
     marginBottom: SPACING.xl,
   },
   title: {
-    color: COLORS.textPrimary,
+    color: colors.textPrimary,
     fontSize: FONTS.size.xlarge,
     fontWeight: FONTS.weight.bold,
   },
@@ -159,13 +197,13 @@ const styles = StyleSheet.create({
     marginBottom: SPACING.xl,
   },
   sectionTitle: {
-    color: COLORS.textPrimary,
+    color: colors.textPrimary,
     fontSize: FONTS.size.large,
     fontWeight: FONTS.weight.semibold,
     marginBottom: SPACING.xs,
   },
   sectionSubtitle: {
-    color: COLORS.textSecondary,
+    color: colors.textSecondary,
     fontSize: FONTS.size.small,
     marginBottom: SPACING.md,
   },
@@ -178,23 +216,23 @@ const styles = StyleSheet.create({
     paddingVertical: SPACING.md,
     paddingHorizontal: SPACING.sm,
     borderRadius: BORDER_RADIUS.md,
-    backgroundColor: COLORS.background,
+    backgroundColor: colors.background,
     alignItems: 'center',
     borderWidth: 2,
-    borderColor: 'transparent',
+    borderColor: colors.transparent,
     minHeight: TOUCH_TARGETS.minSize,
   },
   optionActive: {
-    borderColor: COLORS.accent,
-    backgroundColor: COLORS.primary,
+    borderColor: colors.accent,
+    backgroundColor: colors.primary,
   },
   optionText: {
-    color: COLORS.textSecondary,
+    color: colors.textSecondary,
     fontSize: FONTS.size.medium,
     fontWeight: FONTS.weight.medium,
   },
   optionTextActive: {
-    color: COLORS.textPrimary,
+    color: colors.textPrimary,
   },
   preview: {
     flexDirection: 'row',
@@ -202,23 +240,23 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     gap: SPACING.sm,
     paddingVertical: SPACING.md,
-    backgroundColor: COLORS.background,
+    backgroundColor: colors.background,
     borderRadius: BORDER_RADIUS.md,
     marginBottom: SPACING.xl,
   },
   previewText: {
-    color: COLORS.textSecondary,
+    color: colors.textSecondary,
     fontSize: FONTS.size.small,
   },
   saveButton: {
-    backgroundColor: COLORS.accent,
+    backgroundColor: colors.accent,
     borderRadius: BORDER_RADIUS.md,
     paddingVertical: SPACING.md,
     alignItems: 'center',
     minHeight: TOUCH_TARGETS.recommendedSize,
   },
   saveButtonText: {
-    color: COLORS.textPrimary,
+    color: colors.textPrimary,
     fontSize: FONTS.size.large,
     fontWeight: FONTS.weight.semibold,
   },

@@ -11,7 +11,9 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
-import { COLORS, SPACING, FONTS, BORDER_RADIUS, TOUCH_TARGETS } from '../../constants/theme';
+import { SPACING, FONTS, BORDER_RADIUS, TOUCH_TARGETS } from '../../constants/theme';
+import { Colors } from '../../constants/theme';
+import { useTheme } from '../../context/ThemeContext';
 import { Timer } from '../../components/Timer';
 import { SwipeableTask } from '../../components/SwipeableTask';
 import { AddTaskModal } from '../../components/AddTaskModal';
@@ -52,6 +54,9 @@ export function HomeScreen() {
     handleSettingsSave,
     handleLogout,
   } = useHomeViewModel();
+
+  const { colors } = useTheme();
+  const styles = useStyles(colors);
 
   const longPressTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -156,7 +161,7 @@ export function HomeScreen() {
   if (state.loading) {
     return (
       <View style={styles.loading}>
-        <ActivityIndicator size="large" color={COLORS.accent} />
+        <ActivityIndicator size="large" color={colors.accent} />
       </View>
     );
   }
@@ -178,13 +183,13 @@ export function HomeScreen() {
               onPress={() => setShowStatsModal(true)} 
               style={styles.headerButton}
             >
-              <Ionicons name="stats-chart" size={24} color={COLORS.textSecondary} />
+              <Ionicons name="stats-chart" size={24} color={colors.textSecondary} />
             </TouchableOpacity>
             <TouchableOpacity 
               onPress={() => setShowSettingsModal(true)} 
               style={styles.headerButton}
             >
-              <Ionicons name="settings-outline" size={24} color={COLORS.textSecondary} />
+              <Ionicons name="settings-outline" size={24} color={colors.textSecondary} />
             </TouchableOpacity>
             <TouchableOpacity 
               onPress={() => setShowHistory(!state.showHistory)} 
@@ -193,11 +198,11 @@ export function HomeScreen() {
               <Ionicons 
                 name={state.showHistory ? "list" : "time-outline"} 
                 size={24} 
-                color={COLORS.textSecondary} 
+                color={colors.textSecondary} 
               />
             </TouchableOpacity>
             <TouchableOpacity onPress={handleLogout} style={styles.headerButton}>
-              <Ionicons name="log-out-outline" size={24} color={COLORS.textSecondary} />
+              <Ionicons name="log-out-outline" size={24} color={colors.textSecondary} />
             </TouchableOpacity>
           </View>
         </View>
@@ -208,7 +213,7 @@ export function HomeScreen() {
             <Text style={styles.historyTitle}>Historial de Tareas</Text>
             {completedTasks.length === 0 ? (
               <View style={styles.emptyHistory}>
-                <Ionicons name="checkmark-done-circle-outline" size={48} color={COLORS.textMuted} />
+                <Ionicons name="checkmark-done-circle-outline" size={48} color={colors.textMuted} />
                 <Text style={styles.emptyHistoryText}>No hay tareas completadas aún</Text>
               </View>
             ) : (
@@ -221,7 +226,7 @@ export function HomeScreen() {
                     onPressOut={handleLongPressEnd}
                     delayLongPress={3000}
                   >
-                    <Ionicons name="checkmark-circle" size={24} color={COLORS.success} />
+                    <Ionicons name="checkmark-circle" size={24} color={colors.success} />
                     <View style={styles.historyItemContent}>
                       <Text style={styles.historyItemTitle}>{task.title}</Text>
                       <Text style={styles.historyItemSteps}>{task.steps.length} pasos completados</Text>
@@ -273,7 +278,7 @@ export function HomeScreen() {
               />
             ) : (
               <View style={styles.emptyState}>
-                <Ionicons name="clipboard-outline" size={64} color={COLORS.textMuted} />
+                <Ionicons name="clipboard-outline" size={64} color={colors.textMuted} />
                 <Text style={styles.emptyTitle}>Sin tareas</Text>
                 <Text style={styles.emptySubtitle}>Toca + para agregar tu primera tarea</Text>
               </View>
@@ -300,7 +305,7 @@ export function HomeScreen() {
                     <Ionicons 
                       name={timer.isRunning ? 'pause' : 'play'} 
                       size={28} 
-                      color={COLORS.textPrimary} 
+                      color={colors.textPrimary} 
                     />
                     <Text style={styles.mainButtonText}>
                       {timer.mode === 'break' 
@@ -314,7 +319,7 @@ export function HomeScreen() {
                       style={styles.skipBreakButton}
                       onPress={timer.skipBreak}
                     >
-                      <Ionicons name="play-skip-forward" size={20} color={COLORS.textPrimary} />
+                      <Ionicons name="play-skip-forward" size={20} color={colors.textPrimary} />
                       <Text style={styles.skipBreakText}>Saltar descanso</Text>
                     </TouchableOpacity>
                   )}
@@ -325,7 +330,7 @@ export function HomeScreen() {
                 {/* Botón Completar paso */}
                 {currentTask && (
                   <TouchableOpacity style={styles.iconButtonComplete} onPress={handleCompleteStep}>
-                    <Ionicons name="checkmark-circle" size={28} color={COLORS.success} />
+                    <Ionicons name="checkmark-circle" size={28} color={colors.success} />
                   </TouchableOpacity>
                 )}
 
@@ -334,7 +339,7 @@ export function HomeScreen() {
                   style={styles.addButton}
                   onPress={() => setShowAddModal(true)}
                 >
-                  <Ionicons name="add" size={28} color={COLORS.textPrimary} />
+                  <Ionicons name="add" size={28} color={colors.textPrimary} />
                 </TouchableOpacity>
               </View>
             </View>
@@ -373,7 +378,7 @@ export function HomeScreen() {
 
               {/* AI Disclosure */}
               <View style={styles.aiDisclosure}>
-                <Ionicons name="sparkles" size={14} color={COLORS.textMuted} />
+                <Ionicons name="sparkles" size={14} color={colors.textMuted} />
                 <Text style={styles.aiDisclosureText}>
                   Utiliza IA generativa para crear pasos de tareas
                 </Text>
@@ -438,10 +443,10 @@ export function HomeScreen() {
   );
 }
 
-const styles = StyleSheet.create({
+const useStyles = (colors: Colors) => StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: COLORS.background,
+    backgroundColor: colors.background,
   },
   scrollContainer: {
     flex: 1,
@@ -452,7 +457,7 @@ const styles = StyleSheet.create({
   },
   loading: {
     flex: 1,
-    backgroundColor: COLORS.background,
+    backgroundColor: colors.background,
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -472,7 +477,7 @@ const styles = StyleSheet.create({
     width: 48,
     height: 48,
     borderRadius: 24,
-    backgroundColor: COLORS.primary,
+    backgroundColor: colors.primary,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -480,7 +485,7 @@ const styles = StyleSheet.create({
     width: 16,
     height: 16,
     borderRadius: 8,
-    backgroundColor: COLORS.accent,
+    backgroundColor: colors.accent,
   },
   headerActions: {
     flexDirection: 'row',
@@ -498,7 +503,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: SPACING.lg,
   },
   historyTitle: {
-    color: COLORS.textPrimary,
+    color: colors.textPrimary,
     fontSize: FONTS.size.xlarge,
     fontWeight: FONTS.weight.bold,
     marginBottom: SPACING.lg,
@@ -510,7 +515,7 @@ const styles = StyleSheet.create({
     gap: SPACING.md,
   },
   emptyHistoryText: {
-    color: COLORS.textSecondary,
+    color: colors.textSecondary,
     fontSize: FONTS.size.medium,
   },
   historyList: {
@@ -519,7 +524,7 @@ const styles = StyleSheet.create({
   historyItem: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: COLORS.surface,
+    backgroundColor: colors.surface,
     borderRadius: BORDER_RADIUS.md,
     padding: SPACING.md,
     gap: SPACING.md,
@@ -529,17 +534,17 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   historyItemTitle: {
-    color: COLORS.textPrimary,
+    color: colors.textPrimary,
     fontSize: FONTS.size.medium,
     fontWeight: FONTS.weight.semibold,
     marginBottom: 2,
   },
   historyItemSteps: {
-    color: COLORS.textSecondary,
+    color: colors.textSecondary,
     fontSize: FONTS.size.small,
   },
   historyItemDuration: {
-    color: COLORS.accent,
+    color: colors.accent,
     fontSize: FONTS.size.small,
     fontWeight: FONTS.weight.semibold,
     marginTop: 4,
@@ -549,7 +554,7 @@ const styles = StyleSheet.create({
     gap: 2,
   },
   historyItemDate: {
-    color: COLORS.textMuted,
+    color: colors.textMuted,
     fontSize: FONTS.size.xsmall,
   },
   actions: {
@@ -558,7 +563,7 @@ const styles = StyleSheet.create({
   },
   mainButton: {
     flexDirection: 'row',
-    backgroundColor: COLORS.accent,
+    backgroundColor: colors.accent,
     borderRadius: BORDER_RADIUS.full,
     paddingVertical: SPACING.md,
     paddingHorizontal: SPACING.xl,
@@ -568,13 +573,13 @@ const styles = StyleSheet.create({
     minHeight: TOUCH_TARGETS.recommendedSize,
   },
   mainButtonPause: {
-    backgroundColor: COLORS.warning,
+    backgroundColor: colors.warning,
   },
   mainButtonBreak: {
-    backgroundColor: COLORS.success,
+    backgroundColor: colors.success,
   },
   mainButtonText: {
-    color: COLORS.textPrimary,
+    color: colors.textPrimary,
     fontSize: FONTS.size.large,
     fontWeight: FONTS.weight.semibold,
   },
@@ -588,17 +593,17 @@ const styles = StyleSheet.create({
     width: TOUCH_TARGETS.recommendedSize,
     height: TOUCH_TARGETS.recommendedSize,
     borderRadius: BORDER_RADIUS.md,
-    backgroundColor: COLORS.surface,
+    backgroundColor: colors.surface,
     alignItems: 'center',
     justifyContent: 'center',
     borderWidth: 1,
-    borderColor: COLORS.success,
+    borderColor: colors.success,
   },
   addButton: {
     width: TOUCH_TARGETS.recommendedSize,
     height: TOUCH_TARGETS.recommendedSize,
     borderRadius: BORDER_RADIUS.md,
-    backgroundColor: COLORS.accent,
+    backgroundColor: colors.accent,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -609,14 +614,14 @@ const styles = StyleSheet.create({
     gap: SPACING.sm,
     paddingVertical: SPACING.sm,
     paddingHorizontal: SPACING.md,
-    backgroundColor: COLORS.surface,
+    backgroundColor: colors.surface,
     borderRadius: BORDER_RADIUS.full,
     borderWidth: 1,
-    borderColor: COLORS.border,
+    borderColor: colors.border,
     minHeight: TOUCH_TARGETS.minSize,
   },
   skipBreakText: {
-    color: COLORS.textSecondary,
+    color: colors.textSecondary,
     fontSize: FONTS.size.small,
   },
   emptyState: {
@@ -625,12 +630,12 @@ const styles = StyleSheet.create({
     gap: SPACING.md,
   },
   emptyTitle: {
-    color: COLORS.textPrimary,
+    color: colors.textPrimary,
     fontSize: FONTS.size.xlarge,
     fontWeight: FONTS.weight.bold,
   },
   emptySubtitle: {
-    color: COLORS.textSecondary,
+    color: colors.textSecondary,
     fontSize: FONTS.size.medium,
   },
   footer: {
@@ -645,10 +650,10 @@ const styles = StyleSheet.create({
     width: 10,
     height: 10,
     borderRadius: 5,
-    backgroundColor: COLORS.textMuted,
+    backgroundColor: colors.textMuted,
   },
   dotActive: {
-    backgroundColor: COLORS.accent,
+    backgroundColor: colors.accent,
     width: 28,
   },
   footerLinks: {
@@ -661,11 +666,11 @@ const styles = StyleSheet.create({
     paddingVertical: SPACING.sm,
   },
   footerLinkText: {
-    color: COLORS.textMuted,
+    color: colors.textMuted,
     fontSize: FONTS.size.small,
   },
   footerLinkDanger: {
-    color: COLORS.error,
+    color: colors.error,
   },
   aiDisclosure: {
     flexDirection: 'row',
@@ -675,11 +680,11 @@ const styles = StyleSheet.create({
     marginTop: SPACING.sm,
   },
   aiDisclosureText: {
-    color: COLORS.textMuted,
+    color: colors.textMuted,
     fontSize: FONTS.size.xsmall,
   },
   reportLink: {
-    color: COLORS.accent,
+    color: colors.accent,
     fontSize: FONTS.size.xsmall,
     textDecorationLine: 'underline',
   },

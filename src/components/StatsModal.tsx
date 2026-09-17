@@ -9,7 +9,8 @@ import {
   ActivityIndicator,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { COLORS, SPACING, FONTS } from '../constants/theme';
+import { SPACING, FONTS, Colors } from '../constants/theme';
+import { useTheme } from '../context/ThemeContext';
 import { getWeeklyStats, getTotalStats, DailyStats } from '../services/statsService';
 
 interface StatsModalProps {
@@ -28,6 +29,9 @@ export function StatsModal({ visible, onClose }: StatsModalProps) {
     streak: 0,
   });
   const [loading, setLoading] = useState(true);
+  const { colors } = useTheme();
+
+  const styles = useStyles(colors);
 
   useEffect(() => {
     if (visible) {
@@ -62,33 +66,33 @@ export function StatsModal({ visible, onClose }: StatsModalProps) {
           <View style={styles.header}>
             <Text style={styles.title}>Mis Estadísticas</Text>
             <TouchableOpacity onPress={onClose} style={styles.closeButton}>
-              <Ionicons name="close" size={24} color={COLORS.textSecondary} />
+              <Ionicons name="close" size={24} color={colors.textSecondary} />
             </TouchableOpacity>
           </View>
 
           {loading ? (
-            <ActivityIndicator size="large" color={COLORS.accent} style={styles.loader} />
+            <ActivityIndicator size="large" color={colors.accent} style={styles.loader} />
           ) : (
             <ScrollView showsVerticalScrollIndicator={false}>
               {/* Summary Cards */}
               <View style={styles.summaryGrid}>
                 <View style={styles.summaryCard}>
-                  <Ionicons name="flame" size={28} color={COLORS.accent} />
+                  <Ionicons name="flame" size={28} color={colors.accent} />
                   <Text style={styles.summaryValue}>{totalStats.streak}</Text>
                   <Text style={styles.summaryLabel}>Racha días</Text>
                 </View>
                 <View style={styles.summaryCard}>
-                  <Ionicons name="timer" size={28} color={COLORS.warning} />
+                  <Ionicons name="timer" size={28} color={colors.warning} />
                   <Text style={styles.summaryValue}>{totalStats.totalPomodoros}</Text>
                   <Text style={styles.summaryLabel}>Pomodoros</Text>
                 </View>
                 <View style={styles.summaryCard}>
-                  <Ionicons name="checkmark-circle" size={28} color={COLORS.success} />
+                  <Ionicons name="checkmark-circle" size={28} color={colors.success} />
                   <Text style={styles.summaryValue}>{totalStats.totalTasks}</Text>
                   <Text style={styles.summaryLabel}>Tareas</Text>
                 </View>
                 <View style={styles.summaryCard}>
-                  <Ionicons name="time" size={28} color={COLORS.primary} />
+                  <Ionicons name="time" size={28} color={colors.primary} />
                   <Text style={styles.summaryValue}>{formatHours(totalStats.totalMinutes)}</Text>
                   <Text style={styles.summaryLabel}>Enfoque total</Text>
                 </View>
@@ -132,21 +136,21 @@ export function StatsModal({ visible, onClose }: StatsModalProps) {
                 <Text style={styles.sectionTitle}>Hoy</Text>
                 <View style={styles.todayStats}>
                   <View style={styles.todayRow}>
-                    <Ionicons name="timer-outline" size={20} color={COLORS.textSecondary} />
+                    <Ionicons name="timer-outline" size={20} color={colors.textSecondary} />
                     <Text style={styles.todayLabel}>Pomodoros completados</Text>
                     <Text style={styles.todayValue}>
                       {weeklyStats[weeklyStats.length - 1]?.pomodorosCompleted || 0}
                     </Text>
                   </View>
                   <View style={styles.todayRow}>
-                    <Ionicons name="checkmark-circle-outline" size={20} color={COLORS.textSecondary} />
+                    <Ionicons name="checkmark-circle-outline" size={20} color={colors.textSecondary} />
                     <Text style={styles.todayLabel}>Tareas completadas</Text>
                     <Text style={styles.todayValue}>
                       {weeklyStats[weeklyStats.length - 1]?.tasksCompleted || 0}
                     </Text>
                   </View>
                   <View style={styles.todayRow}>
-                    <Ionicons name="time-outline" size={20} color={COLORS.textSecondary} />
+                    <Ionicons name="time-outline" size={20} color={colors.textSecondary} />
                     <Text style={styles.todayLabel}>Tiempo enfocado</Text>
                     <Text style={styles.todayValue}>
                       {formatHours(weeklyStats[weeklyStats.length - 1]?.totalFocusMinutes || 0)}
@@ -162,16 +166,16 @@ export function StatsModal({ visible, onClose }: StatsModalProps) {
   );
 }
 
-const styles = StyleSheet.create({
+const useStyles = (colors: Colors) => StyleSheet.create({
   overlay: {
     flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.7)',
+    backgroundColor: colors.overlay,
     justifyContent: 'center',
     alignItems: 'center',
     padding: SPACING.lg,
   },
   container: {
-    backgroundColor: COLORS.surface,
+    backgroundColor: colors.surface,
     borderRadius: 20,
     padding: SPACING.lg,
     width: '100%',
@@ -185,7 +189,7 @@ const styles = StyleSheet.create({
     marginBottom: SPACING.lg,
   },
   title: {
-    color: COLORS.textPrimary,
+    color: colors.textPrimary,
     fontSize: FONTS.size.large,
     fontWeight: 'bold',
   },
@@ -203,26 +207,26 @@ const styles = StyleSheet.create({
   },
   summaryCard: {
     width: '48%',
-    backgroundColor: COLORS.background,
+    backgroundColor: colors.background,
     borderRadius: 12,
     padding: SPACING.md,
     alignItems: 'center',
     gap: SPACING.xs,
   },
   summaryValue: {
-    color: COLORS.textPrimary,
+    color: colors.textPrimary,
     fontSize: FONTS.size.xlarge,
     fontWeight: 'bold',
   },
   summaryLabel: {
-    color: COLORS.textSecondary,
+    color: colors.textSecondary,
     fontSize: FONTS.size.small,
   },
   chartSection: {
     marginBottom: SPACING.lg,
   },
   sectionTitle: {
-    color: COLORS.textPrimary,
+    color: colors.textPrimary,
     fontSize: FONTS.size.medium,
     fontWeight: '600',
     marginBottom: SPACING.md,
@@ -232,7 +236,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'flex-end',
     height: 150,
-    backgroundColor: COLORS.background,
+    backgroundColor: colors.background,
     borderRadius: 12,
     padding: SPACING.md,
   },
@@ -242,7 +246,7 @@ const styles = StyleSheet.create({
     gap: SPACING.xs,
   },
   chartValue: {
-    color: COLORS.textSecondary,
+    color: colors.textSecondary,
     fontSize: 12,
   },
   chartBarContainer: {
@@ -251,26 +255,26 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-end',
   },
   chartBar: {
-    backgroundColor: COLORS.accent,
+    backgroundColor: colors.accent,
     borderRadius: 4,
     minHeight: 4,
   },
   chartBarToday: {
-    backgroundColor: COLORS.success,
+    backgroundColor: colors.success,
   },
   chartDay: {
-    color: COLORS.textMuted,
+    color: colors.textMuted,
     fontSize: 12,
   },
   chartDayToday: {
-    color: COLORS.textPrimary,
+    color: colors.textPrimary,
     fontWeight: 'bold',
   },
   todaySection: {
     marginBottom: SPACING.md,
   },
   todayStats: {
-    backgroundColor: COLORS.background,
+    backgroundColor: colors.background,
     borderRadius: 12,
     padding: SPACING.md,
     gap: SPACING.md,
@@ -282,11 +286,11 @@ const styles = StyleSheet.create({
   },
   todayLabel: {
     flex: 1,
-    color: COLORS.textSecondary,
+    color: colors.textSecondary,
     fontSize: FONTS.size.small,
   },
   todayValue: {
-    color: COLORS.textPrimary,
+    color: colors.textPrimary,
     fontSize: FONTS.size.medium,
     fontWeight: '600',
   },

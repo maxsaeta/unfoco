@@ -1,8 +1,10 @@
 import React from 'react';
-import { View, Text, StyleSheet, Animated } from 'react-native';
-import { COLORS, SPACING, FONTS, BORDER_RADIUS } from '../constants/theme';
+import { View, Text, StyleSheet } from 'react-native';
+import { SPACING, FONTS, BORDER_RADIUS } from '../constants/theme';
 import { TimerMode } from '../hooks/useTimer';
 import { formatDuration } from '../shared/utils';
+import { useTheme } from '../context/ThemeContext';
+import { Colors } from '../constants/theme';
 
 interface TimerProps {
   minutes: number;
@@ -12,6 +14,8 @@ interface TimerProps {
 }
 
 export function Timer({ minutes, seconds, isRunning, mode }: TimerProps) {
+  const { colors } = useTheme();
+  const styles = useStyles(colors);
   const isBreak = mode === 'break';
 
   return (
@@ -55,59 +59,59 @@ export function Timer({ minutes, seconds, isRunning, mode }: TimerProps) {
   );
 }
 
-const styles = StyleSheet.create({
+const useStyles = (colors: Colors) => StyleSheet.create({
   container: {
     alignItems: 'center',
     paddingVertical: SPACING.xl,
     paddingHorizontal: SPACING.lg,
   },
   labelContainer: {
-    backgroundColor: COLORS.primary,
+    backgroundColor: colors.primary,
     paddingHorizontal: SPACING.md,
     paddingVertical: SPACING.xs,
     borderRadius: BORDER_RADIUS.full,
     marginBottom: SPACING.md,
   },
   labelContainerBreak: {
-    backgroundColor: COLORS.success,
+    backgroundColor: colors.success,
   },
   label: {
-    color: COLORS.textPrimary,
+    color: colors.textPrimary,
     fontSize: FONTS.size.xs,
     fontWeight: FONTS.weight.semibold,
     letterSpacing: 2,
     textTransform: 'uppercase',
   },
   labelBreak: {
-    color: COLORS.textInverse,
+    color: colors.textInverse,
   },
   timeContainer: {
-    backgroundColor: COLORS.surface,
+    backgroundColor: colors.surface,
     paddingHorizontal: SPACING.xxl,
     paddingVertical: SPACING.lg,
     borderRadius: BORDER_RADIUS.xl,
     marginBottom: SPACING.md,
   },
   timeContainerRunning: {
-    backgroundColor: COLORS.surfaceLight,
+    backgroundColor: colors.surfaceLight,
   },
   time: {
-    color: COLORS.textPrimary,
+    color: colors.textPrimary,
     fontSize: 72,
     fontWeight: FONTS.weight.light,
     fontVariant: ['tabular-nums'],
   },
   timeRunning: {
-    color: COLORS.warning,
+    color: colors.warning,
   },
   timeBreak: {
-    color: COLORS.success,
+    color: colors.success,
   },
   hintContainer: {
     minHeight: 20,
   },
   hint: {
-    color: COLORS.textMuted,
+    color: colors.textMuted,
     fontSize: FONTS.size.small,
     textAlign: 'center',
   },
@@ -120,9 +124,9 @@ const styles = StyleSheet.create({
     width: 12,
     height: 12,
     borderRadius: 6,
-    backgroundColor: COLORS.warning,
+    backgroundColor: colors.warning,
   },
   pulseBreak: {
-    backgroundColor: COLORS.success,
+    backgroundColor: colors.success,
   },
 });

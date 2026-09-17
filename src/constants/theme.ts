@@ -1,37 +1,12 @@
-export const COLORS = {
-  // Colores principales - Calma y enfoque
-  background: '#1a1a2e',      // Azul oscuro profundo
-  surface: '#16213e',          // Azul medio
-  surfaceLight: '#1e2a4a',    // Azul claro para hover/press
-  primary: '#0f3460',          // Azul fuerte
-  accent: '#e94560',           // Rojo coral (urgencia suave)
-  
-  // Texto
-  textPrimary: '#ffffff',      // Blanco puro
-  textSecondary: '#a0a0a0',    // Gris suave
-  textMuted: '#606060',        // Gris apagado
-  textInverse: '#1a1a2e',      // Texto oscuro sobre claro
-  
-  // Estados
-  success: '#4ade80',          // Verde para completar
-  successLight: '#22c55e',     // Verde hover
-  warning: '#fbbf24',          // Amarillo para tiempo
-  warningLight: '#f59e0b',     // Amarillo hover
-  error: '#ef4444',            // Rojo para errores
-  errorLight: '#dc2626',       // Rojo hover
-  info: '#3b82f6',             // Azul informativo
-  
-  // Bordes y sombras
-  border: '#2a3a5c',
-  borderLight: '#3a4a6c',
-  shadow: 'rgba(0, 0, 0, 0.3)',
-  
-  // Gradientes
-  gradientStart: '#1a1a2e',
-  gradientEnd: '#16213e',
-  gradientAccent: ['#e94560', '#ff6b6b'],
-  gradientSuccess: ['#4ade80', '#22c55e'],
-};
+import { darkColors } from './darkColors';
+import { lightColors } from './lightColors';
+
+export type Colors = typeof darkColors;
+
+// Re-exportar COLORS como fallback (tema oscuro) para compatibilidad
+export const COLORS = darkColors;
+
+export { darkColors, lightColors };
 
 export const SPACING = {
   xxs: 2,
@@ -76,21 +51,21 @@ export const BORDER_RADIUS = {
 
 export const SHADOWS = {
   sm: {
-    shadowColor: COLORS.shadow,
+    shadowColor: 'rgba(0, 0, 0, 0.3)',
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.2,
     shadowRadius: 2,
     elevation: 2,
   },
   md: {
-    shadowColor: COLORS.shadow,
+    shadowColor: 'rgba(0, 0, 0, 0.3)',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.3,
     shadowRadius: 4,
     elevation: 4,
   },
   lg: {
-    shadowColor: COLORS.shadow,
+    shadowColor: 'rgba(0, 0, 0, 0.3)',
     shadowOffset: { width: 0, height: 8 },
     shadowOpacity: 0.4,
     shadowRadius: 8,
