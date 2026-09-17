@@ -25,15 +25,6 @@
       "package": "com.unpaso.app",
       "googleServicesFile": "./google-services.json"
     },
-    "plugins": [
-      [
-        "expo-notifications",
-        {
-          "icon": "./assets/icon.png",
-          "color": "#e94560"
-        }
-      ]
-    ],
     "web": {
       "favicon": "./assets/favicon.png"
     }
