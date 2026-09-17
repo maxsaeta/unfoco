@@ -144,6 +144,10 @@ export function useHomeViewModel() {
     setState(prev => ({ ...prev, timerSettings: newSettings }));
   };
 
+  const handleStartTask = async (taskId: string) => {
+    await container.startTaskUseCase.execute(taskId);
+  };
+
   const handleLogout = async () => {
     await container.logoutUseCase.execute();
   };
@@ -164,6 +168,7 @@ export function useHomeViewModel() {
     setShowReportAIModal,
     setTaskToEdit,
     handleAddTask,
+    handleStartTask,
     handleCompleteStep,
     handleDeleteTask,
     handleSettingsSave,

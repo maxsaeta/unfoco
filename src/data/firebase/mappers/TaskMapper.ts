@@ -9,6 +9,7 @@ export interface FirebaseTaskData {
   completed: boolean;
   order: number;
   createdAt: Timestamp;
+  startedAt?: Timestamp | null;
   completedAt?: Timestamp | null;
   step?: string; // Legacy format
 }
@@ -38,6 +39,7 @@ export const TaskMapper = {
         completed: data.completed || false,
         order: data.order,
         createdAt: data.createdAt?.toDate() || new Date(),
+        startedAt: data.startedAt?.toDate(),
         completedAt: data.completedAt?.toDate(),
       };
     }
@@ -51,6 +53,7 @@ export const TaskMapper = {
       completed: data.completed,
       order: data.order,
       createdAt: data.createdAt?.toDate() || new Date(),
+      startedAt: data.startedAt?.toDate(),
       completedAt: data.completedAt?.toDate(),
     };
   },

@@ -29,6 +29,7 @@ export interface Task {
   completed: boolean;
   order: number;
   createdAt: Timestamp;
+  startedAt?: Timestamp;
   completedAt?: Timestamp;
 }
 
@@ -49,6 +50,19 @@ export async function createTask(task: Omit<Task, 'id' | 'createdAt'>) {
     return docRef.id;
   } catch (error) {
     console.error('Error creating task:', error);
+    throw error;
+  }
+}
+
+// Marcar tarea como iniciada
+export async function startTask(taskId: string) {
+  try {
+    const taskRef = doc(db, COLLECTION_NAME, taskId);
+    await updateDoc(taskRef, {
+      startedAt: Timestamp.now(),
+    });
+  } catch (error) {
+    console.error('Error starting task:', error);
     throw error;
   }
 }

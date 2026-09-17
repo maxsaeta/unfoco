@@ -2,6 +2,7 @@ import { Task, CreateTaskDTO, UpdateTaskDTO, CompleteStepResult } from '../types
 
 export interface ITaskRepository {
   create(userId: string, data: CreateTaskDTO): Promise<string>;
+  startTask(taskId: string): Promise<void>;
   getByUserId(userId: string): Promise<Task[]>;
   subscribeToUserTasks(
     userId: string,

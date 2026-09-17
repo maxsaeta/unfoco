@@ -14,6 +14,7 @@ export interface Task {
   completed: boolean;
   order: number;
   createdAt: Date;
+  startedAt?: Date;
   completedAt?: Date;
 }
 

@@ -40,6 +40,13 @@ export class FirebaseTaskRepository implements ITaskRepository {
     return docRef.id;
   }
 
+  async startTask(taskId: string): Promise<void> {
+    const taskRef = doc(db, COLLECTION_NAME, taskId);
+    await updateDoc(taskRef, {
+      startedAt: Timestamp.now(),
+    });
+  }
+
   async getByUserId(userId: string): Promise<Task[]> {
     const q = query(
       collection(db, COLLECTION_NAME),

@@ -46,6 +46,7 @@ export function HomeScreen() {
     setShowReportAIModal,
     setTaskToEdit,
     handleAddTask,
+    handleStartTask,
     handleCompleteStep,
     handleDeleteTask,
     handleSettingsSave,
@@ -127,6 +128,31 @@ export function HomeScreen() {
     setTaskToEdit(null);
   };
 
+  const formatDuration = (start?: Date, end?: Date): string => {
+    if (!start || !end) return '';
+    
+    const diffMs = end.getTime() - start.getTime();
+    const diffMins = Math.floor(diffMs / 60000);
+    const diffHours = Math.floor(diffMins / 60);
+    const remainingMins = diffMins % 60;
+    
+    if (diffHours > 0) {
+      return `${diffHours}h ${remainingMins}min`;
+    }
+    return `${diffMins} min`;
+  };
+
+  const formatDate = (date?: Date): string => {
+    if (!date) return '';
+    return date.toLocaleDateString('es-ES', {
+      day: '2-digit',
+      month: 'short',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+    });
+  };
+
   if (state.loading) {
     return (
       <View style={styles.loading}>
@@ -199,6 +225,23 @@ export function HomeScreen() {
                     <View style={styles.historyItemContent}>
                       <Text style={styles.historyItemTitle}>{task.title}</Text>
                       <Text style={styles.historyItemSteps}>{task.steps.length} pasos completados</Text>
+                      {task.startedAt && task.completedAt && (
+                        <Text style={styles.historyItemDuration}>
+                          Duración: {formatDuration(task.startedAt, task.completedAt)}
+                        </Text>
+                      )}
+                      <View style={styles.historyItemDates}>
+                        {task.startedAt && (
+                          <Text style={styles.historyItemDate}>
+                            Inicio: {formatDate(task.startedAt)}
+                          </Text>
+                        )}
+                        {task.completedAt && (
+                          <Text style={styles.historyItemDate}>
+                            Fin: {formatDate(task.completedAt)}
+                          </Text>
+                        )}
+                      </View>
                     </View>
                   </TouchableOpacity>
                 ))}
@@ -246,7 +289,13 @@ export function HomeScreen() {
                       timer.isRunning && styles.mainButtonPause,
                       timer.mode === 'break' && styles.mainButtonBreak,
                     ]}
-                    onPress={timer.toggle}
+                    onPress={() => {
+                      // Mark task as started when user presses play for the first time
+                      if (!timer.isRunning && timer.mode === 'work' && !currentTask.startedAt) {
+                        handleStartTask(currentTask.id!);
+                      }
+                      timer.toggle();
+                    }}
                   >
                     <Ionicons 
                       name={timer.isRunning ? 'pause' : 'play'} 
@@ -488,6 +537,20 @@ const styles = StyleSheet.create({
   historyItemSteps: {
     color: COLORS.textSecondary,
     fontSize: FONTS.size.small,
+  },
+  historyItemDuration: {
+    color: COLORS.accent,
+    fontSize: FONTS.size.small,
+    fontWeight: FONTS.weight.semibold,
+    marginTop: 4,
+  },
+  historyItemDates: {
+    marginTop: 4,
+    gap: 2,
+  },
+  historyItemDate: {
+    color: COLORS.textMuted,
+    fontSize: FONTS.size.xsmall,
   },
   actions: {
     paddingHorizontal: SPACING.lg,
