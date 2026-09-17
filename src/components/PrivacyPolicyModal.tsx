@@ -16,7 +16,7 @@ interface PrivacyPolicyModalProps {
   onClose: () => void;
 }
 
-const PRIVACY_POLICY_URL = 'https://1paso-web.netlify.app/legal/privacy.html';
+const PRIVACY_POLICY_URL = 'https://1paso.netlify.app/legal/privacy.html';
 
 export function PrivacyPolicyModal({ visible, onClose }: PrivacyPolicyModalProps) {
   const handleOpenWebVersion = () => {
