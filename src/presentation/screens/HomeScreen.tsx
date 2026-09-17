@@ -16,6 +16,9 @@ import { AddTaskModal } from '../../components/AddTaskModal';
 import { EditTaskModal } from '../../components/EditTaskModal';
 import { SettingsModal } from '../../components/SettingsModal';
 import { StatsModal } from '../../components/StatsModal';
+import { PrivacyPolicyModal } from '../../components/PrivacyPolicyModal';
+import { DeleteAccountModal } from '../../components/DeleteAccountModal';
+import { ReportAIModal } from '../../components/ReportAIModal';
 import { useTimer } from '../../hooks/useTimer';
 import { useHomeViewModel } from './HomeViewModel';
 import { registerForPushNotifications } from '../../services/notificationService';
@@ -34,6 +37,9 @@ export function HomeScreen() {
     setShowHistory,
     setShowSettingsModal,
     setShowStatsModal,
+    setShowPrivacyModal,
+    setShowDeleteAccountModal,
+    setShowReportAIModal,
     setTaskToEdit,
     handleAddTask,
     handleCompleteStep,
@@ -287,6 +293,33 @@ export function HomeScreen() {
                   ))}
                 </View>
               )}
+
+              {/* Footer Links */}
+              <View style={styles.footerLinks}>
+                <TouchableOpacity 
+                  style={styles.footerLink}
+                  onPress={() => setShowPrivacyModal(true)}
+                >
+                  <Text style={styles.footerLinkText}>Política de Privacidad</Text>
+                </TouchableOpacity>
+                <TouchableOpacity 
+                  style={styles.footerLink}
+                  onPress={() => setShowDeleteAccountModal(true)}
+                >
+                  <Text style={[styles.footerLinkText, styles.footerLinkDanger]}>Eliminar Cuenta</Text>
+                </TouchableOpacity>
+              </View>
+
+              {/* AI Disclosure */}
+              <View style={styles.aiDisclosure}>
+                <Ionicons name="sparkles" size={14} color={COLORS.textMuted} />
+                <Text style={styles.aiDisclosureText}>
+                  Utiliza IA generativa para crear pasos de tareas
+                </Text>
+                <TouchableOpacity onPress={() => setShowReportAIModal(true)}>
+                  <Text style={styles.reportLink}>Reportar</Text>
+                </TouchableOpacity>
+              </View>
             </View>
           </>
         )}
@@ -321,6 +354,24 @@ export function HomeScreen() {
       <StatsModal
         visible={state.showStatsModal}
         onClose={() => setShowStatsModal(false)}
+      />
+
+      {/* Modal Política de Privacidad */}
+      <PrivacyPolicyModal
+        visible={state.showPrivacyModal}
+        onClose={() => setShowPrivacyModal(false)}
+      />
+
+      {/* Modal Eliminar Cuenta */}
+      <DeleteAccountModal
+        visible={state.showDeleteAccountModal}
+        onClose={() => setShowDeleteAccountModal(false)}
+      />
+
+      {/* Modal Reportar IA */}
+      <ReportAIModal
+        visible={state.showReportAIModal}
+        onClose={() => setShowReportAIModal(false)}
       />
     </SafeAreaView>
   );
@@ -517,5 +568,37 @@ const styles = StyleSheet.create({
   dotActive: {
     backgroundColor: COLORS.accent,
     width: 28,
+  },
+  footerLinks: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    gap: SPACING.xl,
+    marginTop: SPACING.md,
+  },
+  footerLink: {
+    paddingVertical: SPACING.sm,
+  },
+  footerLinkText: {
+    color: COLORS.textMuted,
+    fontSize: FONTS.size.small,
+  },
+  footerLinkDanger: {
+    color: COLORS.error,
+  },
+  aiDisclosure: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: SPACING.xs,
+    marginTop: SPACING.sm,
+  },
+  aiDisclosureText: {
+    color: COLORS.textMuted,
+    fontSize: FONTS.size.xsmall,
+  },
+  reportLink: {
+    color: COLORS.accent,
+    fontSize: FONTS.size.xsmall,
+    textDecorationLine: 'underline',
   },
 });

@@ -48,6 +48,7 @@ export const FONTS = {
   regular: 'System',
   bold: 'System',
   size: {
+    xsmall: 10,
     xs: 12,
     small: 14,
     medium: 16,

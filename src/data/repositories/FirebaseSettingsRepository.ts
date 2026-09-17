@@ -1,4 +1,4 @@
-import { doc, getDoc, setDoc } from 'firebase/firestore';
+import { doc, getDoc, setDoc, deleteDoc } from 'firebase/firestore';
 import { db } from '../../config/firebase';
 import { ISettingsRepository } from '../../domain/repositories';
 import { TimerSettings } from '../../domain/types';
@@ -30,6 +30,15 @@ export class FirebaseSettingsRepository implements ISettingsRepository {
       await setDoc(docRef, { timerSettings: settings }, { merge: true });
     } catch (error) {
       console.error('Error saving timer settings:', error);
+    }
+  }
+
+  async delete(userId: string): Promise<void> {
+    try {
+      const docRef = doc(db, 'users', userId);
+      await deleteDoc(docRef);
+    } catch (error) {
+      console.error('Error deleting user settings:', error);
     }
   }
 }

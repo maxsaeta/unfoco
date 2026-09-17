@@ -13,6 +13,9 @@ export interface HomeState {
   showHistory: boolean;
   showSettingsModal: boolean;
   showStatsModal: boolean;
+  showPrivacyModal: boolean;
+  showDeleteAccountModal: boolean;
+  showReportAIModal: boolean;
   taskToEdit: Task | null;
 }
 
@@ -27,6 +30,9 @@ export function useHomeViewModel() {
     showHistory: false,
     showSettingsModal: false,
     showStatsModal: false,
+    showPrivacyModal: false,
+    showDeleteAccountModal: false,
+    showReportAIModal: false,
     taskToEdit: null,
   });
 
@@ -76,6 +82,18 @@ export function useHomeViewModel() {
 
   const setShowStatsModal = useCallback((show: boolean) => {
     setState(prev => ({ ...prev, showStatsModal: show }));
+  }, []);
+
+  const setShowPrivacyModal = useCallback((show: boolean) => {
+    setState(prev => ({ ...prev, showPrivacyModal: show }));
+  }, []);
+
+  const setShowDeleteAccountModal = useCallback((show: boolean) => {
+    setState(prev => ({ ...prev, showDeleteAccountModal: show }));
+  }, []);
+
+  const setShowReportAIModal = useCallback((show: boolean) => {
+    setState(prev => ({ ...prev, showReportAIModal: show }));
   }, []);
 
   const setTaskToEdit = useCallback((task: Task | null) => {
@@ -141,6 +159,9 @@ export function useHomeViewModel() {
     setShowHistory,
     setShowSettingsModal,
     setShowStatsModal,
+    setShowPrivacyModal,
+    setShowDeleteAccountModal,
+    setShowReportAIModal,
     setTaskToEdit,
     handleAddTask,
     handleCompleteStep,

@@ -1,4 +1,4 @@
-import { doc, getDoc, setDoc } from 'firebase/firestore';
+import { doc, getDoc, setDoc, deleteDoc } from 'firebase/firestore';
 import { db } from '../../config/firebase';
 import { IStatsRepository } from '../../domain/repositories';
 import { UserStats, DailyStats, TotalStats } from '../../domain/types';
@@ -108,5 +108,14 @@ export class FirebaseStatsRepository implements IStatsRepository {
     });
 
     return { totalPomodoros, totalTasks, totalMinutes, streak };
+  }
+
+  async delete(userId: string): Promise<void> {
+    try {
+      const docRef = doc(db, 'users', userId);
+      await deleteDoc(docRef);
+    } catch (error) {
+      console.error('Error deleting user stats:', error);
+    }
   }
 }
