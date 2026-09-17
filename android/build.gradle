@@ -1,6 +1,20 @@
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
 
 buildscript {
+  ext {
+    // Android SDK versions
+    minSdkVersion = 24
+    targetSdkVersion = 35
+    compileSdkVersion = 35
+    ndkVersion = "28.0.13004108"
+    buildToolsVersion = "35.0.1"
+    
+    // Kotlin version
+    kotlinVersion = "2.0.21"
+    
+    // React Native versions
+    reactNativeVersion = "0.86.3"
+  }
   repositories {
     google()
     mavenCentral()
