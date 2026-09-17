@@ -5,7 +5,8 @@ import {
   StyleSheet, 
   ScrollView, 
   TouchableOpacity,
-  Modal
+  Modal,
+  Linking
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { COLORS, SPACING, FONTS, BORDER_RADIUS, TOUCH_TARGETS } from '../constants/theme';
@@ -15,7 +16,13 @@ interface PrivacyPolicyModalProps {
   onClose: () => void;
 }
 
+const PRIVACY_POLICY_URL = 'https://1paso-web.netlify.app/legal/privacy.html';
+
 export function PrivacyPolicyModal({ visible, onClose }: PrivacyPolicyModalProps) {
+  const handleOpenWebVersion = () => {
+    Linking.openURL(PRIVACY_POLICY_URL);
+  };
+
   return (
     <Modal
       visible={visible}
@@ -155,6 +162,11 @@ export function PrivacyPolicyModal({ visible, onClose }: PrivacyPolicyModalProps
             Email: maxsaeta@gmail.com
           </Text>
 
+          <TouchableOpacity style={styles.webLinkButton} onPress={handleOpenWebVersion}>
+            <Ionicons name="open-outline" size={20} color={COLORS.accent} />
+            <Text style={styles.webLinkText}>Ver versión completa en web</Text>
+          </TouchableOpacity>
+
           <View style={styles.bottomSpacer} />
         </ScrollView>
       </View>
@@ -214,6 +226,23 @@ const styles = StyleSheet.create({
   bold: {
     fontWeight: FONTS.weight.semibold,
     color: COLORS.textPrimary,
+  },
+  webLinkButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: SPACING.sm,
+    padding: SPACING.md,
+    marginTop: SPACING.xl,
+    backgroundColor: COLORS.surface,
+    borderRadius: BORDER_RADIUS.md,
+    borderWidth: 1,
+    borderColor: COLORS.accent,
+  },
+  webLinkText: {
+    color: COLORS.accent,
+    fontSize: FONTS.size.medium,
+    fontWeight: FONTS.weight.semibold,
   },
   bottomSpacer: {
     height: SPACING.xxxl * 2,
