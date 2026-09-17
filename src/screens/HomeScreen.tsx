@@ -14,6 +14,7 @@ import { Timer } from '../components/Timer';
 import { SwipeableTask } from '../components/SwipeableTask';
 import { AddTaskModal } from '../components/AddTaskModal';
 import { EditTaskModal } from '../components/EditTaskModal';
+import { SettingsModal } from '../components/SettingsModal';
 import { useTimer } from '../hooks/useTimer';
 import { 
   getUserTasks, 
@@ -26,6 +27,7 @@ import {
   TaskStep 
 } from '../services/taskService';
 import { logout } from '../services/authService';
+import { getTimerSettings, TimerSettings } from '../services/settingsService';
 import { auth } from '../config/firebase';
 
 export function HomeScreen() {
@@ -35,7 +37,9 @@ export function HomeScreen() {
   const [showAddModal, setShowAddModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [showHistory, setShowHistory] = useState(false);
+  const [showSettingsModal, setShowSettingsModal] = useState(false);
   const [taskToEdit, setTaskToEdit] = useState<Task | null>(null);
+  const [timerSettings, setTimerSettings] = useState<TimerSettings>({ workMinutes: 25, breakMinutes: 5 });
   const longPressTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // Filtrar tareas activas (no completadas)
@@ -46,12 +50,12 @@ export function HomeScreen() {
   const currentTask = activeTasks.length > 0 ? activeTasks[currentTaskIndex] || null : null;
 
   const timer = useTimer({
-    workMinutes: 25,
-    breakMinutes: 5,
+    workMinutes: timerSettings.workMinutes,
+    breakMinutes: timerSettings.breakMinutes,
     onWorkComplete: () => {
       Alert.alert(
         '⏰ ¡Pomodoro completado!', 
-        'Tómate un descanso de 5 minutos. El timer arrancará automáticamente.',
+        `Tómate un descanso de ${timerSettings.breakMinutes} minutos. El timer arrancará automáticamente.`,
       );
     },
     onBreakComplete: () => {
@@ -63,6 +67,7 @@ export function HomeScreen() {
   });
 
   useEffect(() => {
+    loadSettings();
     const userId = auth.currentUser?.uid;
     if (!userId) return;
 
@@ -75,6 +80,15 @@ export function HomeScreen() {
     // Limpiar suscripción al desmontar
     return () => unsubscribe();
   }, []);
+
+  const loadSettings = async () => {
+    const settings = await getTimerSettings();
+    setTimerSettings(settings);
+  };
+
+  const handleSettingsSave = (newSettings: TimerSettings) => {
+    setTimerSettings(newSettings);
+  };
 
   const handleAddTask = async (taskTitle: string, steps: { title: string; description: string }[]) => {
     try {
@@ -231,6 +245,12 @@ export function HomeScreen() {
             <View style={styles.logoDot} />
           </View>
           <View style={styles.headerActions}>
+            <TouchableOpacity 
+              onPress={() => setShowSettingsModal(true)} 
+              style={styles.headerButton}
+            >
+              <Ionicons name="settings-outline" size={24} color={COLORS.textSecondary} />
+            </TouchableOpacity>
             <TouchableOpacity 
               onPress={() => setShowHistory(!showHistory)} 
               style={styles.headerButton}
@@ -393,6 +413,13 @@ export function HomeScreen() {
           setTaskToEdit(null);
         }}
         onUpdate={handleUpdateTask}
+      />
+
+      {/* Modal Configuración */}
+      <SettingsModal
+        visible={showSettingsModal}
+        onClose={() => setShowSettingsModal(false)}
+        onSave={handleSettingsSave}
       />
     </SafeAreaView>
   );
