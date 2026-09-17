@@ -1,30 +1,42 @@
-import * as Notifications from 'expo-notifications';
 import { Platform } from 'react-native';
 
-let pushNotificationsAvailable = true;
+let Notifications: typeof import('expo-notifications') | null = null;
+let notificationsAvailable = false;
 
-try {
-  Notifications.setNotificationHandler({
-    handleNotification: async () => ({
-      shouldShowAlert: true,
-      shouldPlaySound: true,
-      shouldSetBadge: false,
-      shouldShowBanner: true,
-      shouldShowList: true,
-    }),
-  });
-} catch (error) {
-  console.log('Notifications not available in this environment');
-  pushNotificationsAvailable = false;
-}
+const loadNotifications = async (): Promise<boolean> => {
+  try {
+    if (Platform.OS === 'web') return false;
+    
+    const mod = await import('expo-notifications');
+    Notifications = mod;
+    
+    Notifications.setNotificationHandler({
+      handleNotification: async () => ({
+        shouldShowAlert: true,
+        shouldPlaySound: true,
+        shouldSetBadge: false,
+        shouldShowBanner: true,
+        shouldShowList: true,
+      }),
+    });
+    
+    notificationsAvailable = true;
+    return true;
+  } catch (error) {
+    console.log('Notifications not available:', error);
+    notificationsAvailable = false;
+    return false;
+  }
+};
 
 export const isPushNotificationsAvailable = (): boolean => {
-  return pushNotificationsAvailable;
+  return notificationsAvailable;
 };
 
 export const registerForPushNotifications = async (): Promise<string | null> => {
-  if (!pushNotificationsAvailable) {
-    console.log('Push notifications not available in Expo Go SDK 57+');
+  const loaded = await loadNotifications();
+  if (!loaded || !Notifications) {
+    console.log('Push notifications not available in this environment');
     return null;
   }
 
@@ -42,8 +54,7 @@ export const registerForPushNotifications = async (): Promise<string | null> => 
       return null;
     }
 
-    // Skip push token in Expo Go (not supported in SDK 57+)
-    console.log('Push notifications configured (local only in Expo Go)');
+    console.log('Push notifications configured');
     return null;
   } catch (error) {
     console.log('Push notifications not available:', error);
@@ -56,7 +67,8 @@ export const scheduleTimerNotification = async (
   title: string,
   body: string
 ): Promise<string | null> => {
-  if (!pushNotificationsAvailable) {
+  const loaded = await loadNotifications();
+  if (!loaded || !Notifications) {
     console.log('Local notifications not available');
     return null;
   }
@@ -82,7 +94,7 @@ export const scheduleTimerNotification = async (
 };
 
 export const cancelNotification = async (notificationId: string): Promise<void> => {
-  if (!pushNotificationsAvailable) return;
+  if (!Notifications) return;
 
   try {
     await Notifications.cancelScheduledNotificationAsync(notificationId);
@@ -92,7 +104,7 @@ export const cancelNotification = async (notificationId: string): Promise<void> 
 };
 
 export const cancelAllNotifications = async (): Promise<void> => {
-  if (!pushNotificationsAvailable) return;
+  if (!Notifications) return;
 
   try {
     await Notifications.cancelAllScheduledNotificationsAsync();
@@ -102,9 +114,9 @@ export const cancelAllNotifications = async (): Promise<void> => {
 };
 
 export const addNotificationListener = (
-  handler: (notification: Notifications.Notification) => void
+  handler: (notification: any) => void
 ) => {
-  if (!pushNotificationsAvailable) return { remove: () => {} };
+  if (!Notifications) return { remove: () => {} };
 
   try {
     return Notifications.addNotificationReceivedListener(handler);
@@ -115,9 +127,9 @@ export const addNotificationListener = (
 };
 
 export const addNotificationResponseListener = (
-  handler: (response: Notifications.NotificationResponse) => void
+  handler: (response: any) => void
 ) => {
-  if (!pushNotificationsAvailable) return { remove: () => {} };
+  if (!Notifications) return { remove: () => {} };
 
   try {
     return Notifications.addNotificationResponseReceivedListener(handler);
