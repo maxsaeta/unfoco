@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "UnPaso",
-    "slug": "unpaso",
+    "name": "NeuroPaso",
+    "slug": "neuropaso",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -23,10 +23,21 @@
         "monochromeImage": "./assets/android-icon-monochrome.png"
       },
       "package": "com.unpaso.app",
-      "googleServicesFile": "./google-services.json"
+      "googleServicesFile": "./google-services.json",
+      "useNextNotificationsApi": true
     },
     "web": {
       "favicon": "./assets/favicon.png"
-    }
+    },
+    "plugins": [
+      [
+        "expo-notifications",
+        {
+          "icon": "./assets/icon.png",
+          "color": "#e94560",
+          "mode": "production"
+        }
+      ]
+    ]
   }
 }
