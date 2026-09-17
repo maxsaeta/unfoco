@@ -38,13 +38,13 @@ export function SwipeableTask({ task, onSwipeLeft, onSwipeRight, onDelete, onEdi
   const currentStep = task.steps.find(step => !step.completed) || task.steps[task.steps.length - 1];
   const completedSteps = task.steps.filter(step => step.completed).length;
 
-  const handleDoubleTap = () => {
+  const handleDoubleTap = (): boolean => {
     const now = Date.now();
     if (lastTap.current && (now - lastTap.current) < 300) {
-      // Doble tap detectado
       setShowMenu(true);
     }
     lastTap.current = now;
+    return false;
   };
 
   const panResponder = useRef(

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { 
   View, 
   Text,
@@ -36,6 +36,7 @@ export function HomeScreen() {
   const [showEditModal, setShowEditModal] = useState(false);
   const [showHistory, setShowHistory] = useState(false);
   const [taskToEdit, setTaskToEdit] = useState<Task | null>(null);
+  const longPressTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // Filtrar tareas activas (no completadas)
   const activeTasks = tasks.filter(task => !task.completed);
@@ -45,18 +46,18 @@ export function HomeScreen() {
   const currentTask = activeTasks.length > 0 ? activeTasks[currentTaskIndex] || null : null;
 
   const timer = useTimer({
-    initialMinutes: 25,
-    initialSeconds: 0,
-    onComplete: () => {
+    workMinutes: 25,
+    breakMinutes: 5,
+    onWorkComplete: () => {
       Alert.alert(
-        '⏰ ¡Tiempo!', 
-        'Tómate un descanso de 5 minutos.',
-        [
-          { text: 'Cancelar', style: 'cancel' },
-          { text: 'Iniciar descanso', onPress: () => {
-            Alert.alert('Descanso', 'Descansa 5 minutos y vuelve a comenzar.');
-          }}
-        ]
+        '⏰ ¡Pomodoro completado!', 
+        'Tómate un descanso de 5 minutos. El timer arrancará automáticamente.',
+      );
+    },
+    onBreakComplete: () => {
+      Alert.alert(
+        '💪 ¡Descanso terminado!', 
+        '¿Listo para otro Pomodoro?',
       );
     },
   });
@@ -152,7 +153,7 @@ export function HomeScreen() {
   };
 
   const handleLongPressStart = (taskId: string, taskTitle: string) => {
-    const timer = setTimeout(() => {
+    longPressTimerRef.current = setTimeout(() => {
       Alert.alert(
         'Eliminar tarea',
         `¿Estás seguro de que quieres eliminar "${taskTitle}"?`,
@@ -166,13 +167,12 @@ export function HomeScreen() {
         ]
       );
     }, 3000);
-    setLongPressTimer(timer);
   };
 
   const handleLongPressEnd = () => {
-    if (longPressTimer) {
-      clearTimeout(longPressTimer);
-      setLongPressTimer(null);
+    if (longPressTimerRef.current) {
+      clearTimeout(longPressTimerRef.current);
+      longPressTimerRef.current = null;
     }
   };
 
@@ -283,6 +283,7 @@ export function HomeScreen() {
               minutes={timer.minutes} 
               seconds={timer.seconds}
               isRunning={timer.isRunning}
+              mode={timer.mode}
             />
 
             {/* Tarea Actual con Swipe */}
@@ -305,19 +306,37 @@ export function HomeScreen() {
             {/* Acciones */}
             <View style={styles.actions}>
               {currentTask && (
-                <TouchableOpacity 
-                  style={[styles.mainButton, timer.isRunning && styles.mainButtonPause]}
-                  onPress={timer.toggle}
-                >
-                  <Ionicons 
-                    name={timer.isRunning ? 'pause' : 'play'} 
-                    size={28} 
-                    color={COLORS.textPrimary} 
-                  />
-                  <Text style={styles.mainButtonText}>
-                    {timer.isRunning ? 'PAUSAR' : 'EMPEZAR'}
-                  </Text>
-                </TouchableOpacity>
+                <>
+                  <TouchableOpacity 
+                    style={[
+                      styles.mainButton, 
+                      timer.isRunning && styles.mainButtonPause,
+                      timer.mode === 'break' && styles.mainButtonBreak,
+                    ]}
+                    onPress={timer.toggle}
+                  >
+                    <Ionicons 
+                      name={timer.isRunning ? 'pause' : 'play'} 
+                      size={28} 
+                      color={COLORS.textPrimary} 
+                    />
+                    <Text style={styles.mainButtonText}>
+                      {timer.mode === 'break' 
+                        ? (timer.isRunning ? 'PAUSAR DESCANSO' : 'INICIAR DESCANSO')
+                        : (timer.isRunning ? 'PAUSAR' : 'EMPEZAR')}
+                    </Text>
+                  </TouchableOpacity>
+
+                  {timer.mode === 'break' && !timer.isRunning && (
+                    <TouchableOpacity 
+                      style={styles.skipBreakButton}
+                      onPress={timer.skipBreak}
+                    >
+                      <Ionicons name="play-skip-forward" size={20} color={COLORS.textPrimary} />
+                      <Text style={styles.skipBreakText}>Saltar descanso</Text>
+                    </TouchableOpacity>
+                  )}
+                </>
               )}
               
               <View style={styles.secondaryActions}>
@@ -484,6 +503,9 @@ const styles = StyleSheet.create({
   mainButtonPause: {
     backgroundColor: COLORS.warning,
   },
+  mainButtonBreak: {
+    backgroundColor: COLORS.success,
+  },
   mainButtonText: {
     color: COLORS.textPrimary,
     fontSize: FONTS.size.medium,
@@ -512,6 +534,22 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.accent,
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  skipBreakButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: SPACING.sm,
+    paddingVertical: SPACING.sm,
+    paddingHorizontal: SPACING.md,
+    backgroundColor: COLORS.surface,
+    borderRadius: 20,
+    borderWidth: 1,
+    borderColor: COLORS.textMuted,
+  },
+  skipBreakText: {
+    color: COLORS.textSecondary,
+    fontSize: FONTS.size.small,
   },
   emptyState: {
     alignItems: 'center',
