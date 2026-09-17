@@ -1,10 +1,10 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { 
   View, 
   Text, 
+  StyleSheet, 
   TextInput, 
   TouchableOpacity, 
-  StyleSheet, 
   Alert,
   ActivityIndicator,
   KeyboardAvoidingView,
@@ -12,51 +12,11 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
-import { COLORS, SPACING, FONTS } from '../constants/theme';
-import { loginWithEmail, registerWithEmail } from '../services/authService';
+import { COLORS, SPACING, FONTS } from '../../constants/theme';
+import { useLoginViewModel } from './LoginViewModel';
 
-interface LoginScreenProps {
-  onLoginSuccess: () => void;
-}
-
-export function LoginScreen({ onLoginSuccess }: LoginScreenProps) {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [isLogin, setIsLogin] = useState(true);
-  const [loading, setLoading] = useState(false);
-
-  const handleEmailAuth = async () => {
-    if (!email || !password) {
-      Alert.alert('Error', 'Por favor completa todos los campos');
-      return;
-    }
-
-    setLoading(true);
-    try {
-      if (isLogin) {
-        await loginWithEmail(email, password);
-      } else {
-        await registerWithEmail(email, password);
-      }
-      onLoginSuccess();
-    } catch (error: any) {
-      let message = 'Error al autenticar';
-      if (error.code === 'auth/user-not-found') {
-        message = 'No existe una cuenta con este email';
-      } else if (error.code === 'auth/wrong-password') {
-        message = 'Contraseña incorrecta';
-      } else if (error.code === 'auth/email-already-in-use') {
-        message = 'Este email ya está registrado';
-      } else if (error.code === 'auth/weak-password') {
-        message = 'La contraseña debe tener al menos 6 caracteres';
-      } else if (error.code === 'auth/invalid-email') {
-        message = 'Email inválido';
-      }
-      Alert.alert('Error', message);
-    } finally {
-      setLoading(false);
-    }
-  };
+export function LoginScreen() {
+  const { state, setEmail, setPassword, toggleMode, handleSubmit } = useLoginViewModel();
 
   return (
     <SafeAreaView style={styles.container}>
@@ -66,12 +26,12 @@ export function LoginScreen({ onLoginSuccess }: LoginScreenProps) {
       >
         <View style={styles.content}>
           {/* Logo */}
-          <View style={styles.logoSection}>
+          <View style={styles.logoContainer}>
             <View style={styles.logo}>
               <View style={styles.logoDot} />
             </View>
             <Text style={styles.appName}>UnPaso</Text>
-            <Text style={styles.tagline}>Una tarea a la vez</Text>
+            <Text style={styles.tagline}>Un paso a la vez</Text>
           </View>
 
           {/* Form */}
@@ -80,44 +40,44 @@ export function LoginScreen({ onLoginSuccess }: LoginScreenProps) {
               style={styles.input}
               placeholder="Email"
               placeholderTextColor={COLORS.textMuted}
-              value={email}
+              value={state.email}
               onChangeText={setEmail}
               keyboardType="email-address"
               autoCapitalize="none"
               autoCorrect={false}
             />
-            
+
             <TextInput
               style={styles.input}
               placeholder="Contraseña"
               placeholderTextColor={COLORS.textMuted}
-              value={password}
+              value={state.password}
               onChangeText={setPassword}
               secureTextEntry
             />
 
+            {state.error && (
+              <Text style={styles.error}>{state.error}</Text>
+            )}
+
             <TouchableOpacity 
-              style={[styles.buttonPrimary, loading && styles.buttonDisabled]}
-              onPress={handleEmailAuth}
-              disabled={loading}
+              style={styles.submitButton}
+              onPress={handleSubmit}
+              disabled={state.loading}
             >
-              {loading ? (
+              {state.loading ? (
                 <ActivityIndicator color={COLORS.textPrimary} />
               ) : (
-                <Text style={styles.buttonText}>
-                  {isLogin ? 'INICIAR SESIÓN' : 'CREAR CUENTA'}
+                <Text style={styles.submitButtonText}>
+                  {state.isLogin ? 'Iniciar Sesión' : 'Registrarse'}
                 </Text>
               )}
             </TouchableOpacity>
 
-            {/* Toggle Login/Register */}
-            <TouchableOpacity 
-              style={styles.toggleButton}
-              onPress={() => setIsLogin(!isLogin)}
-            >
+            <TouchableOpacity style={styles.toggleButton} onPress={toggleMode}>
               <Text style={styles.toggleText}>
-                {isLogin 
-                  ? '¿No tienes cuenta? Créala aquí' 
+                {state.isLogin 
+                  ? '¿No tienes cuenta? Regístrate' 
                   : '¿Ya tienes cuenta? Inicia sesión'}
               </Text>
             </TouchableOpacity>
@@ -141,7 +101,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     paddingHorizontal: SPACING.xl,
   },
-  logoSection: {
+  logoContainer: {
     alignItems: 'center',
     marginBottom: SPACING.xxl,
   },
@@ -155,14 +115,14 @@ const styles = StyleSheet.create({
     marginBottom: SPACING.md,
   },
   logoDot: {
-    width: 24,
-    height: 24,
-    borderRadius: 12,
+    width: 28,
+    height: 28,
+    borderRadius: 14,
     backgroundColor: COLORS.accent,
   },
   appName: {
     color: COLORS.textPrimary,
-    fontSize: FONTS.size.xxlarge,
+    fontSize: FONTS.size.xlarge,
     fontWeight: 'bold',
     marginBottom: SPACING.xs,
   },
@@ -179,31 +139,29 @@ const styles = StyleSheet.create({
     padding: SPACING.md,
     color: COLORS.textPrimary,
     fontSize: FONTS.size.medium,
-    borderWidth: 1,
-    borderColor: COLORS.primary,
   },
-  buttonPrimary: {
+  error: {
+    color: COLORS.error,
+    fontSize: FONTS.size.small,
+    textAlign: 'center',
+  },
+  submitButton: {
     backgroundColor: COLORS.accent,
-    borderRadius: 50,
-    paddingVertical: SPACING.md,
+    borderRadius: 12,
+    padding: SPACING.md,
     alignItems: 'center',
-    marginTop: SPACING.sm,
   },
-  buttonDisabled: {
-    opacity: 0.7,
-  },
-  buttonText: {
+  submitButtonText: {
     color: COLORS.textPrimary,
     fontSize: FONTS.size.medium,
     fontWeight: '600',
-    letterSpacing: 1,
   },
   toggleButton: {
-    marginTop: SPACING.md,
     alignItems: 'center',
+    padding: SPACING.sm,
   },
   toggleText: {
-    color: COLORS.accent,
+    color: COLORS.textSecondary,
     fontSize: FONTS.size.small,
   },
 });

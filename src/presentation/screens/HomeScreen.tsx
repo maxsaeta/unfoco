@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useRef } from 'react';
 import { 
   View, 
   Text,
@@ -9,58 +9,52 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
-import { COLORS, SPACING, FONTS } from '../constants/theme';
-import { Timer } from '../components/Timer';
-import { SwipeableTask } from '../components/SwipeableTask';
-import { AddTaskModal } from '../components/AddTaskModal';
-import { EditTaskModal } from '../components/EditTaskModal';
-import { SettingsModal } from '../components/SettingsModal';
-import { StatsModal } from '../components/StatsModal';
-import { useTimer } from '../hooks/useTimer';
-import { 
-  getUserTasks, 
-  subscribeToUserTasks,
-  createTask, 
-  completeCurrentStep, 
-  goToPreviousStep,
-  deleteTask,
-  Task, 
-  TaskStep 
-} from '../services/taskService';
-import { logout } from '../services/authService';
-import { getTimerSettings, TimerSettings } from '../services/settingsService';
-import { registerForPushNotifications } from '../services/notificationService';
-import { incrementPomodoro, incrementTaskCompleted } from '../services/statsService';
-import { auth } from '../config/firebase';
+import { COLORS, SPACING, FONTS } from '../../constants/theme';
+import { Timer } from '../../components/Timer';
+import { SwipeableTask } from '../../components/SwipeableTask';
+import { AddTaskModal } from '../../components/AddTaskModal';
+import { EditTaskModal } from '../../components/EditTaskModal';
+import { SettingsModal } from '../../components/SettingsModal';
+import { StatsModal } from '../../components/StatsModal';
+import { useTimer } from '../../hooks/useTimer';
+import { useHomeViewModel } from './HomeViewModel';
+import { registerForPushNotifications } from '../../services/notificationService';
+import { container } from '../../di/container';
+import { auth } from '../../config/firebase';
 
 export function HomeScreen() {
-  const [tasks, setTasks] = useState<Task[]>([]);
-  const [currentTaskIndex, setCurrentTaskIndex] = useState(0);
-  const [loading, setLoading] = useState(true);
-  const [showAddModal, setShowAddModal] = useState(false);
-  const [showEditModal, setShowEditModal] = useState(false);
-  const [showHistory, setShowHistory] = useState(false);
-  const [showSettingsModal, setShowSettingsModal] = useState(false);
-  const [showStatsModal, setShowStatsModal] = useState(false);
-  const [taskToEdit, setTaskToEdit] = useState<Task | null>(null);
-  const [timerSettings, setTimerSettings] = useState<TimerSettings>({ workMinutes: 25, breakMinutes: 5 });
+  const {
+    state,
+    activeTasks,
+    completedTasks,
+    currentTask,
+    setCurrentTaskIndex,
+    setShowAddModal,
+    setShowEditModal,
+    setShowHistory,
+    setShowSettingsModal,
+    setShowStatsModal,
+    setTaskToEdit,
+    handleAddTask,
+    handleCompleteStep,
+    handleDeleteTask,
+    handleSettingsSave,
+    handleLogout,
+  } = useHomeViewModel();
+
   const longPressTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  // Filtrar tareas activas (no completadas)
-  const activeTasks = tasks.filter(task => !task.completed);
-  // Filtrar tareas completadas (historial)
-  const completedTasks = tasks.filter(task => task.completed);
-
-  const currentTask = activeTasks.length > 0 ? activeTasks[currentTaskIndex] || null : null;
-
   const timer = useTimer({
-    workMinutes: timerSettings.workMinutes,
-    breakMinutes: timerSettings.breakMinutes,
+    workMinutes: state.timerSettings.workMinutes,
+    breakMinutes: state.timerSettings.breakMinutes,
     onWorkComplete: () => {
-      incrementPomodoro(timerSettings.workMinutes);
+      const userId = auth.currentUser?.uid;
+      if (userId) {
+        container.incrementPomodoroUseCase.execute(userId, state.timerSettings.workMinutes);
+      }
       Alert.alert(
         '⏰ ¡Pomodoro completado!', 
-        `Tómate un descanso de ${timerSettings.breakMinutes} minutos. El timer arrancará automáticamente.`,
+        `Tómate un descanso de ${state.timerSettings.breakMinutes} minutos. El timer arrancará automáticamente.`,
       );
     },
     onBreakComplete: () => {
@@ -71,104 +65,20 @@ export function HomeScreen() {
     },
   });
 
-  useEffect(() => {
-    loadSettings();
+  React.useEffect(() => {
     registerForPushNotifications();
-    const userId = auth.currentUser?.uid;
-    if (!userId) return;
-
-    // Suscribirse a cambios en tiempo real
-    const unsubscribe = subscribeToUserTasks(userId, (updatedTasks) => {
-      setTasks(updatedTasks);
-      setLoading(false);
-    });
-
-    // Limpiar suscripción al desmontar
-    return () => unsubscribe();
   }, []);
 
-  const loadSettings = async () => {
-    const settings = await getTimerSettings();
-    setTimerSettings(settings);
-  };
-
-  const handleSettingsSave = (newSettings: TimerSettings) => {
-    setTimerSettings(newSettings);
-  };
-
-  const handleAddTask = async (taskTitle: string, steps: { title: string; description: string }[]) => {
-    try {
-      const userId = auth.currentUser?.uid;
-      if (!userId) return;
-
-      const taskSteps: TaskStep[] = steps.map((s, index) => ({
-        id: Math.random().toString(36).substring(2, 15),
-        title: s.title,
-        description: s.description,
-        completed: false
-      }));
-
-      const newTask: Omit<Task, 'id' | 'createdAt'> = {
-        userId,
-        title: taskTitle,
-        steps: taskSteps,
-        currentStepIndex: 0,
-        completed: false,
-        order: tasks.length,
-      };
-
-      const taskId = await createTask(newTask);
-      
-      setTasks([...tasks, { ...newTask, id: taskId, createdAt: { seconds: Date.now() / 1000 } as any }]);
-    } catch (error) {
-      console.error('Error adding task:', error);
-      Alert.alert('Error', 'No se pudo agregar la tarea');
-    }
-  };
-
-  const handleCompleteStep = async () => {
-    if (!currentTask) return;
-
-    try {
-      const result = await completeCurrentStep(currentTask.id!, currentTask);
-      
-      // Actualizar estado local
-      const updatedTasks = tasks.map(task => {
-        if (task.id === currentTask.id) {
-          return {
-            ...task,
-            steps: result.steps,
-            currentStepIndex: result.currentStepIndex,
-            completed: result.allCompleted
-          };
-        }
-        return task;
-      });
-      setTasks(updatedTasks);
-      timer.reset();
-
-      if (result.allCompleted) {
-        incrementTaskCompleted();
-        Alert.alert('🎉 ¡Felicidades!', `Completaste la tarea: ${currentTask.title}`);
-        if (currentTaskIndex >= activeTasks.length - 1) {
-          setCurrentTaskIndex(Math.max(0, activeTasks.length - 2));
-        }
-      }
-    } catch (error) {
-      console.error('Error completing step:', error);
-    }
-  };
-
   const handleSwipeLeft = () => {
-    if (currentTaskIndex < activeTasks.length - 1) {
-      setCurrentTaskIndex(currentTaskIndex + 1);
+    if (state.currentTaskIndex < activeTasks.length - 1) {
+      setCurrentTaskIndex(state.currentTaskIndex + 1);
       timer.reset();
     }
   };
 
   const handleSwipeRight = () => {
-    if (currentTaskIndex > 0) {
-      setCurrentTaskIndex(currentTaskIndex - 1);
+    if (state.currentTaskIndex > 0) {
+      setCurrentTaskIndex(state.currentTaskIndex - 1);
       timer.reset();
     }
   };
@@ -197,45 +107,17 @@ export function HomeScreen() {
     }
   };
 
-  const handleDeleteTask = async (taskId: string) => {
-    try {
-      await deleteTask(taskId);
-      const updatedTasks = tasks.filter(task => task.id !== taskId);
-      setTasks(updatedTasks);
-      
-      const newActiveTasks = updatedTasks.filter(task => !task.completed);
-      if (currentTaskIndex >= newActiveTasks.length) {
-        setCurrentTaskIndex(Math.max(0, newActiveTasks.length - 1));
-      }
-    } catch (error) {
-      console.error('Error deleting task:', error);
-      Alert.alert('Error', 'No se pudo eliminar la tarea');
-    }
-  };
-
-  const handleEditTask = (task: Task) => {
+  const onEditTask = (task: any) => {
     setTaskToEdit(task);
     setShowEditModal(true);
   };
 
-  const handleUpdateTask = (updatedTask: Task) => {
-    const updatedTasks = tasks.map(task => 
-      task.id === updatedTask.id ? updatedTask : task
-    );
-    setTasks(updatedTasks);
+  const onUpdateTask = () => {
     setShowEditModal(false);
     setTaskToEdit(null);
   };
 
-  const handleLogout = async () => {
-    try {
-      await logout();
-    } catch (error) {
-      Alert.alert('Error', 'No se pudo cerrar sesión');
-    }
-  };
-
-  if (loading) {
+  if (state.loading) {
     return (
       <View style={styles.loading}>
         <ActivityIndicator size="large" color={COLORS.accent} />
@@ -265,11 +147,11 @@ export function HomeScreen() {
               <Ionicons name="settings-outline" size={24} color={COLORS.textSecondary} />
             </TouchableOpacity>
             <TouchableOpacity 
-              onPress={() => setShowHistory(!showHistory)} 
+              onPress={() => setShowHistory(!state.showHistory)} 
               style={styles.headerButton}
             >
               <Ionicons 
-                name={showHistory ? "list" : "time-outline"} 
+                name={state.showHistory ? "list" : "time-outline"} 
                 size={24} 
                 color={COLORS.textSecondary} 
               />
@@ -281,7 +163,7 @@ export function HomeScreen() {
         </View>
 
         {/* Vista de Historial */}
-        {showHistory ? (
+        {state.showHistory ? (
           <View style={styles.historyContainer}>
             <Text style={styles.historyTitle}>Historial de Tareas</Text>
             {completedTasks.length === 0 ? (
@@ -326,7 +208,7 @@ export function HomeScreen() {
                 onSwipeLeft={handleSwipeLeft}
                 onSwipeRight={handleSwipeRight}
                 onDelete={() => handleDeleteTask(currentTask.id!)}
-                onEdit={() => handleEditTask(currentTask)}
+                onEdit={() => onEditTask(currentTask)}
               />
             ) : (
               <View style={styles.emptyState}>
@@ -371,7 +253,7 @@ export function HomeScreen() {
                   )}
                 </>
               )}
-              
+
               <View style={styles.secondaryActions}>
                 {/* Botón Completar paso */}
                 {currentTask && (
@@ -399,7 +281,7 @@ export function HomeScreen() {
                       key={index}
                       style={[
                         styles.dot,
-                        index === currentTaskIndex && styles.dotActive,
+                        index === state.currentTaskIndex && styles.dotActive,
                       ]} 
                     />
                   ))}
@@ -412,32 +294,32 @@ export function HomeScreen() {
 
       {/* Modal Agregar Tarea */}
       <AddTaskModal
-        visible={showAddModal}
+        visible={state.showAddModal}
         onClose={() => setShowAddModal(false)}
         onAdd={handleAddTask}
       />
 
       {/* Modal Modificar Tarea */}
       <EditTaskModal
-        visible={showEditModal}
-        task={taskToEdit}
+        visible={state.showEditModal}
+        task={state.taskToEdit}
         onClose={() => {
           setShowEditModal(false);
           setTaskToEdit(null);
         }}
-        onUpdate={handleUpdateTask}
+        onUpdate={onUpdateTask}
       />
 
       {/* Modal Configuración */}
       <SettingsModal
-        visible={showSettingsModal}
+        visible={state.showSettingsModal}
         onClose={() => setShowSettingsModal(false)}
         onSave={handleSettingsSave}
       />
 
       {/* Modal Estadísticas */}
       <StatsModal
-        visible={showStatsModal}
+        visible={state.showStatsModal}
         onClose={() => setShowStatsModal(false)}
       />
     </SafeAreaView>

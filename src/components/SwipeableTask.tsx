@@ -12,7 +12,7 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { COLORS, SPACING, FONTS } from '../constants/theme';
-import { Task } from '../services/taskService';
+import { Task } from '../domain/types';
 
 interface SwipeableTaskProps {
   task: Task;

@@ -14,9 +14,9 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { COLORS, SPACING, FONTS } from '../constants/theme';
-import { Task, TaskStep } from '../services/taskService';
+import { Task, TaskStep } from '../domain/types';
 import { generateTaskSteps } from '../services/aiService';
-import { updateTask } from '../services/taskService';
+import { container } from '../di/container';
 
 interface EditTaskModalProps {
   visible: boolean;
@@ -49,7 +49,7 @@ export function EditTaskModal({ visible, task, onClose, onUpdate }: EditTaskModa
     }
 
     try {
-      const updatedTask = await updateTask(task.id!, {
+      await container.taskRepository.update(task.id!, {
         title: title.trim(),
         steps: steps
       });
