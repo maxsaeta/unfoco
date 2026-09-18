@@ -14,7 +14,13 @@
     "next": "Next",
     "done": "Done",
     "yes": "Yes",
-    "no": "No"
+    "no": "No",
+    "password": "Password",
+    "login": "Log In",
+    "register": "Sign Up",
+    "forgotPassword": "Forgot your password?",
+    "noAccount": "Don't have an account? Sign up",
+    "hasAccount": "Already have an account? Log in"
   },
   "home": {
     "title": "NeuroPaso",
@@ -128,6 +134,14 @@
   "deleteAccount": {
     "title": "Delete Account",
     "confirm": "Are you sure? This action cannot be undone."
+  },
+  "forgotPassword": {
+    "title": "Reset Password",
+    "subtitle": "Enter your email and we'll send you a link to reset your password",
+    "emailPlaceholder": "Your email",
+    "send": "Send link",
+    "success": "Email sent. Check your inbox.",
+    "backToLogin": "Back to login"
   },
   "reportAI": {
     "title": "Report AI Issue",

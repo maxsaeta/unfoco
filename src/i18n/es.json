@@ -14,7 +14,13 @@
     "next": "Siguiente",
     "done": "Listo",
     "yes": "Sí",
-    "no": "No"
+    "no": "No",
+    "password": "Contraseña",
+    "login": "Iniciar Sesión",
+    "register": "Registrarse",
+    "forgotPassword": "¿Olvidaste tu contraseña?",
+    "noAccount": "¿No tienes cuenta? Regístrate",
+    "hasAccount": "¿Ya tienes cuenta? Inicia sesión"
   },
   "home": {
     "title": "NeuroPaso",
@@ -128,6 +134,14 @@
   "deleteAccount": {
     "title": "Eliminar Cuenta",
     "confirm": "¿Estás seguro? Esta acción no se puede deshacer."
+  },
+  "forgotPassword": {
+    "title": "Recuperar Contraseña",
+    "subtitle": "Ingresa tu email y te enviaremos un enlace para restablecer tu contraseña",
+    "emailPlaceholder": "Tu email",
+    "send": "Enviar enlace",
+    "success": "Email enviado. Revisa tu bandeja de entrada.",
+    "backToLogin": "Volver al inicio de sesión"
   },
   "reportAI": {
     "title": "Reportar Problema con IA",

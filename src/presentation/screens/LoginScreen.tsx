@@ -14,12 +14,82 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { SPACING, FONTS, BORDER_RADIUS, TOUCH_TARGETS, Colors } from '../../constants/theme';
 import { useTheme } from '../../context/ThemeContext';
+import { useLanguage } from '../../i18n/LanguageContext';
 import { useLoginViewModel } from './LoginViewModel';
 
 export function LoginScreen() {
   const { colors } = useTheme();
+  const { t } = useLanguage();
   const styles = useStyles(colors);
-  const { state, setEmail, setPassword, toggleMode, handleSubmit } = useLoginViewModel();
+  const { 
+    state, setEmail, setPassword, toggleMode, handleSubmit,
+    showForgotPasswordScreen, hideForgotPasswordScreen, handleResetPassword
+  } = useLoginViewModel();
+
+  if (state.showForgotPassword) {
+    return (
+      <SafeAreaView style={styles.container}>
+        <KeyboardAvoidingView 
+          style={styles.keyboardView}
+          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        >
+          <View style={styles.content}>
+            <View style={styles.logoContainer}>
+              <Ionicons name="lock-closed" size={48} color={colors.primary} />
+              <Text style={styles.appName}>{t('forgotPassword.title')}</Text>
+              <Text style={styles.tagline}>{t('forgotPassword.subtitle')}</Text>
+            </View>
+
+            <View style={styles.form}>
+              {state.resetSent ? (
+                <View style={styles.successContainer}>
+                  <Ionicons name="checkmark-circle" size={64} color={colors.success} />
+                  <Text style={styles.successText}>{t('forgotPassword.success')}</Text>
+                  <TouchableOpacity style={styles.submitButton} onPress={hideForgotPasswordScreen}>
+                    <Text style={styles.submitButtonText}>{t('forgotPassword.backToLogin')}</Text>
+                  </TouchableOpacity>
+                </View>
+              ) : (
+                <>
+                  <TextInput
+                    style={styles.input}
+                    placeholder={t('forgotPassword.emailPlaceholder')}
+                    placeholderTextColor={colors.textMuted}
+                    value={state.email}
+                    onChangeText={setEmail}
+                    keyboardType="email-address"
+                    autoCapitalize="none"
+                    autoCorrect={false}
+                  />
+
+                  {state.error && (
+                    <Text style={styles.error}>{state.error}</Text>
+                  )}
+
+                  <TouchableOpacity 
+                    style={styles.submitButton}
+                    onPress={handleResetPassword}
+                    disabled={state.loading}
+                  >
+                    {state.loading ? (
+                      <ActivityIndicator color={colors.textPrimary} />
+                    ) : (
+                      <Text style={styles.submitButtonText}>{t('forgotPassword.send')}</Text>
+                    )}
+                  </TouchableOpacity>
+                </>
+              )}
+
+              <TouchableOpacity style={styles.toggleButton} onPress={hideForgotPasswordScreen}>
+                <Ionicons name="arrow-back" size={16} color={colors.textSecondary} />
+                <Text style={styles.toggleText}>{t('forgotPassword.backToLogin')}</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </KeyboardAvoidingView>
+      </SafeAreaView>
+    );
+  }
 
   return (
     <SafeAreaView style={styles.container}>
@@ -31,7 +101,7 @@ export function LoginScreen() {
           {/* Logo */}
           <View style={styles.logoContainer}>
             <Text style={styles.appName}>NeuroPaso</Text>
-            <Text style={styles.tagline}>Un paso a la vez</Text>
+            <Text style={styles.tagline}>{t('app.tagline')}</Text>
           </View>
 
           {/* Form */}
@@ -49,12 +119,18 @@ export function LoginScreen() {
 
             <TextInput
               style={styles.input}
-              placeholder="Contraseña"
+              placeholder={t('common.password')}
               placeholderTextColor={colors.textMuted}
               value={state.password}
               onChangeText={setPassword}
               secureTextEntry
             />
+
+            {state.isLogin && (
+              <TouchableOpacity style={styles.forgotButton} onPress={showForgotPasswordScreen}>
+                <Text style={styles.forgotText}>{t('common.forgotPassword')}</Text>
+              </TouchableOpacity>
+            )}
 
             {state.error && (
               <Text style={styles.error}>{state.error}</Text>
@@ -69,7 +145,7 @@ export function LoginScreen() {
                 <ActivityIndicator color={colors.textPrimary} />
               ) : (
                 <Text style={styles.submitButtonText}>
-                  {state.isLogin ? 'Iniciar Sesión' : 'Registrarse'}
+                  {state.isLogin ? t('common.login') : t('common.register')}
                 </Text>
               )}
             </TouchableOpacity>
@@ -77,8 +153,8 @@ export function LoginScreen() {
             <TouchableOpacity style={styles.toggleButton} onPress={toggleMode}>
               <Text style={styles.toggleText}>
                 {state.isLogin 
-                  ? '¿No tienes cuenta? Regístrate' 
-                  : '¿Ya tienes cuenta? Inicia sesión'}
+                  ? t('common.noAccount') 
+                  : t('common.hasAccount')}
               </Text>
             </TouchableOpacity>
           </View>
@@ -105,15 +181,6 @@ const useStyles = (colors: Colors) => StyleSheet.create({
     alignItems: 'center',
     marginBottom: SPACING.xxxl,
   },
-  logo: {
-    width: 96,
-    height: 96,
-    borderRadius: 48,
-    backgroundColor: colors.primary,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: SPACING.lg,
-  },
   appName: {
     color: colors.textPrimary,
     fontSize: FONTS.size.xxxlarge,
@@ -123,6 +190,7 @@ const useStyles = (colors: Colors) => StyleSheet.create({
   tagline: {
     color: colors.textSecondary,
     fontSize: FONTS.size.large,
+    textAlign: 'center',
   },
   form: {
     gap: SPACING.lg,
@@ -136,6 +204,14 @@ const useStyles = (colors: Colors) => StyleSheet.create({
     minHeight: TOUCH_TARGETS.recommendedSize,
     borderWidth: 1,
     borderColor: colors.border,
+  },
+  forgotButton: {
+    alignItems: 'flex-end',
+    paddingVertical: SPACING.xs,
+  },
+  forgotText: {
+    color: colors.primary,
+    fontSize: FONTS.size.medium,
   },
   error: {
     color: colors.error,
@@ -156,12 +232,24 @@ const useStyles = (colors: Colors) => StyleSheet.create({
     fontWeight: FONTS.weight.semibold,
   },
   toggleButton: {
+    flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'center',
+    gap: SPACING.xs,
     padding: SPACING.md,
     minHeight: TOUCH_TARGETS.minSize,
   },
   toggleText: {
     color: colors.textSecondary,
     fontSize: FONTS.size.medium,
+  },
+  successContainer: {
+    alignItems: 'center',
+    gap: SPACING.lg,
+  },
+  successText: {
+    color: colors.success,
+    fontSize: FONTS.size.large,
+    textAlign: 'center',
   },
 });

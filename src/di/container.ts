@@ -2,7 +2,7 @@ import { ITaskRepository, IAuthRepository, IStatsRepository, ISettingsRepository
 import { FirebaseTaskRepository, FirebaseAuthRepository, FirebaseStatsRepository, FirebaseSettingsRepository, FirebasePlanRepository } from '../data/repositories';
 
 import { CreateTaskUseCase, GetTasksUseCase, CompleteStepUseCase, DeleteTaskUseCase, StartTaskUseCase } from '../domain/usecases/tasks';
-import { LoginUseCase, RegisterUseCase, LogoutUseCase, DeleteAccountUseCase } from '../domain/usecases/auth';
+import { LoginUseCase, RegisterUseCase, LogoutUseCase, DeleteAccountUseCase, ResetPasswordUseCase } from '../domain/usecases/auth';
 import { IncrementPomodoroUseCase, IncrementTaskCompletedUseCase, GetStatsUseCase } from '../domain/usecases/stats';
 import { GetTimerSettingsUseCase, SaveTimerSettingsUseCase } from '../domain/usecases/settings';
 import { GetDailyPrioritiesUseCase, SaveDailyPrioritiesUseCase, SaveMoodUseCase, GetMoodHistoryUseCase, SaveShutdownChecklistUseCase, GetShutdownChecklistUseCase } from '../domain/usecases/plan';
@@ -88,6 +88,10 @@ class Container {
 
   get deleteAccountUseCase(): DeleteAccountUseCase {
     return new DeleteAccountUseCase(this._taskRepository, this._settingsRepository, this._statsRepository, this._planRepository);
+  }
+
+  get resetPasswordUseCase(): ResetPasswordUseCase {
+    return new ResetPasswordUseCase(this._authRepository);
   }
 
   // Use Cases - Stats

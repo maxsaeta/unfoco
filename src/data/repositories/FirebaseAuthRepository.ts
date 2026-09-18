@@ -2,6 +2,7 @@ import {
   signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
   signOut,
+  sendPasswordResetEmail,
   onAuthStateChanged,
   User as FirebaseUser
 } from 'firebase/auth';
@@ -43,6 +44,10 @@ export class FirebaseAuthRepository implements IAuthRepository {
 
   async logout(): Promise<void> {
     await signOut(auth);
+  }
+
+  async resetPassword(email: string): Promise<void> {
+    await sendPasswordResetEmail(auth, email);
   }
 
   getCurrentUser(): User | null {
