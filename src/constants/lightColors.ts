@@ -1,9 +1,9 @@
 // M3 Light Theme Color Scheme
 export const lightColors = {
   // Primary
-  primary: '#753358',
+  primary: '#b82e44',
   onPrimary: '#ffffff',
-  primaryContainer: '#ffd8e4',
+  primaryContainer: '#ffd8de',
   onPrimaryContainer: '#3e1028',
 
   // Secondary
@@ -48,7 +48,7 @@ export const lightColors = {
   // Inverse
   inverseSurface: '#322832',
   inverseOnSurface: '#f2e0e8',
-  inversePrimary: '#e8a0bf',
+  inversePrimary: '#e84057',
 
   // Scrim & Shadow
   scrim: '#000000',
@@ -72,17 +72,17 @@ export const lightColors = {
   transparent: 'transparent',
 
   tintedError: 'rgba(186, 26, 26, 0.08)',
-  tintedAccent: 'rgba(117, 51, 88, 0.08)',
+  tintedAccent: 'rgba(184, 46, 68, 0.08)',
   tintedInfo: 'rgba(89, 92, 142, 0.08)',
   tintedWarning: 'rgba(217, 119, 6, 0.08)',
 
   // Gradients
   gradientStart: '#fceef5',
   gradientEnd: '#f1e7ee',
-  gradientAccent: ['#753358', '#595c8e'],
+  gradientAccent: ['#b82e44', '#595c8e'],
   gradientSuccess: ['#16a34a', '#22c55e'],
 
   // Legacy aliases (backwards compatibility)
-  accent: '#753358',
+  accent: '#b82e44',
   surfaceLight: '#ece1e9',
 };

@@ -1,10 +1,10 @@
 // M3 Dark Theme Color Scheme
 export const darkColors = {
   // Primary
-  primary: '#e8a0bf',
-  onPrimary: '#3e1028',
-  primaryContainer: '#5c1940',
-  onPrimaryContainer: '#ffd8e4',
+  primary: '#e84057',
+  onPrimary: '#ffffff',
+  primaryContainer: '#8c1a32',
+  onPrimaryContainer: '#ffd8de',
 
   // Secondary
   secondary: '#d0b8c9',
@@ -48,7 +48,7 @@ export const darkColors = {
   // Inverse
   inverseSurface: '#f2e0e8',
   inverseOnSurface: '#1a1120',
-  inversePrimary: '#753358',
+  inversePrimary: '#e84057',
 
   // Scrim & Shadow
   scrim: '#000000',
@@ -72,17 +72,17 @@ export const darkColors = {
   transparent: 'transparent',
 
   tintedError: 'rgba(255, 180, 171, 0.1)',
-  tintedAccent: 'rgba(232, 160, 191, 0.1)',
+  tintedAccent: 'rgba(232, 64, 87, 0.1)',
   tintedInfo: 'rgba(196, 200, 255, 0.1)',
   tintedWarning: 'rgba(251, 191, 36, 0.1)',
 
   // Gradients
   gradientStart: '#1a1120',
   gradientEnd: '#231a24',
-  gradientAccent: ['#e8a0bf', '#c4c8ff'],
+  gradientAccent: ['#e84057', '#c4c8ff'],
   gradientSuccess: ['#4ade80', '#22c55e'],
 
   // Legacy aliases (backwards compatibility)
-  accent: '#e8a0bf',
+  accent: '#e84057',
   surfaceLight: '#322832',
 };
