@@ -637,22 +637,21 @@ const useStyles = (colors: Colors) => StyleSheet.create({
     paddingVertical: SPACING.md,
   },
   header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
     alignItems: 'center',
     paddingHorizontal: SPACING.lg,
     paddingTop: SPACING.sm,
+    paddingBottom: SPACING.sm,
   },
   headerTitle: {
     color: colors.textPrimary,
     fontSize: FONTS.size.xlarge,
     fontWeight: FONTS.weight.bold,
-    flexShrink: 0,
+    marginBottom: SPACING.sm,
   },
   headerActions: {
     flexDirection: 'row',
     gap: SPACING.xs,
-    flexShrink: 0,
+    justifyContent: 'center',
   },
   headerButton: {
     padding: SPACING.sm,
