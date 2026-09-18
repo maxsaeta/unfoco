@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { StatusBar } from 'expo-status-bar';
 import { View, ActivityIndicator, StyleSheet } from 'react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
@@ -7,12 +7,14 @@ import { LoginScreen } from './src/presentation/screens/LoginScreen';
 import { useAuth } from './src/hooks/useAuth';
 import { ThemeProvider, useTheme } from './src/context/ThemeContext';
 import { LanguageProvider } from './src/i18n';
+import * as Font from 'expo-font';
+import Ionicons from '@expo/vector-icons/Ionicons';
 
-function AppContent() {
+function AppContent({ fontsLoaded }: { fontsLoaded: boolean }) {
   const { user, loading } = useAuth();
   const { colors, isDark } = useTheme();
 
-  if (loading) {
+  if (loading || !fontsLoaded) {
     return (
       <SafeAreaProvider>
         <View style={[styles.loading, { backgroundColor: colors.background }]}>
@@ -40,10 +42,27 @@ function AppContent() {
 }
 
 export default function App() {
+  const [fontsLoaded, setFontsLoaded] = useState(false);
+
+  useEffect(() => {
+    async function loadFonts() {
+      try {
+        const fontObj = Ionicons.font;
+        console.log('Loading font:', JSON.stringify(fontObj));
+        await Font.loadAsync(fontObj);
+        setFontsLoaded(true);
+      } catch (e) {
+        console.warn('Font loading failed:', e);
+        setFontsLoaded(true);
+      }
+    }
+    loadFonts();
+  }, []);
+
   return (
     <LanguageProvider>
       <ThemeProvider>
-        <AppContent />
+        <AppContent fontsLoaded={fontsLoaded} />
       </ThemeProvider>
     </LanguageProvider>
   );

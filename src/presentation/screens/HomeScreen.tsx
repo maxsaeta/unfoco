@@ -71,6 +71,14 @@ export function HomeScreen() {
   const longPressTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [celebrationMessage, setCelebrationMessage] = useState<string | null>(null);
   const celebrationOpacity = useRef(new Animated.Value(0)).current;
+  const [showStateSummary, setShowStateSummary] = useState(true);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setShowStateSummary(false);
+    }, 5000);
+    return () => clearTimeout(timer);
+  }, []);
 
   const showCelebration = (type: 'step' | 'task') => {
     const message = type === 'task' 
@@ -232,13 +240,58 @@ export function HomeScreen() {
 
   return (
     <SafeAreaView style={styles.container} edges={['top', 'left', 'right']}>
+      {/* Header fijo fuera del ScrollView */}
+      <View style={styles.header}>
+        <Text style={styles.headerTitle}>NeuroPaso</Text>
+        <View style={styles.headerActions}>
+          <TouchableOpacity 
+            onPress={() => setShowMoodTracker(true)} 
+            style={styles.headerButton}
+          >
+            <Ionicons name="heart-outline" size={24} color={colors.textPrimary} />
+          </TouchableOpacity>
+          <TouchableOpacity 
+            onPress={() => setShowBrainDump(true)} 
+            style={styles.headerButton}
+          >
+            <Ionicons name="bulb-outline" size={24} color={colors.textPrimary} />
+          </TouchableOpacity>
+          <TouchableOpacity 
+            onPress={() => setShowStatsModal(true)} 
+            style={styles.headerButton}
+          >
+            <Ionicons name="stats-chart" size={24} color={colors.textPrimary} />
+          </TouchableOpacity>
+          <TouchableOpacity 
+            onPress={() => setShowSettingsModal(true)} 
+            style={styles.headerButton}
+          >
+            <Ionicons name="settings-outline" size={24} color={colors.textPrimary} />
+          </TouchableOpacity>
+          <TouchableOpacity 
+            onPress={() => setShowHistory(!state.showHistory)} 
+            style={styles.headerButton}
+          >
+            <Ionicons 
+              name={state.showHistory ? "list" : "time-outline"} 
+              size={24} 
+              color={colors.textPrimary} 
+            />
+          </TouchableOpacity>
+          <TouchableOpacity onPress={handleLogout} style={styles.headerButton}>
+            <Ionicons name="log-out-outline" size={24} color={colors.textPrimary} />
+          </TouchableOpacity>
+        </View>
+      </View>
+
       <ScrollView 
         style={styles.scrollContainer}
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
       >
+
         {/* Resumen de Estado - Restate State */}
-        {progressSummary && progressSummary.completedSteps > 0 && (
+        {showStateSummary && progressSummary && progressSummary.completedSteps > 0 && (
           <View style={styles.stateSummary}>
             <Text style={styles.greeting}>{getGreeting()}</Text>
             <View style={styles.stateSummaryContent}>
@@ -253,50 +306,6 @@ export function HomeScreen() {
             </View>
           </View>
         )}
-
-        {/* Header */}
-        <View style={styles.header}>
-          <Text style={styles.headerTitle}>NeuroPaso</Text>
-          <View style={styles.headerActions}>
-            <TouchableOpacity 
-              onPress={() => setShowMoodTracker(true)} 
-              style={styles.headerButton}
-            >
-              <Ionicons name="heart-outline" size={24} color={colors.textSecondary} />
-            </TouchableOpacity>
-            <TouchableOpacity 
-              onPress={() => setShowBrainDump(true)} 
-              style={styles.headerButton}
-            >
-              <Ionicons name="bulb-outline" size={24} color={colors.textSecondary} />
-            </TouchableOpacity>
-            <TouchableOpacity 
-              onPress={() => setShowStatsModal(true)} 
-              style={styles.headerButton}
-            >
-              <Ionicons name="stats-chart" size={24} color={colors.textSecondary} />
-            </TouchableOpacity>
-            <TouchableOpacity 
-              onPress={() => setShowSettingsModal(true)} 
-              style={styles.headerButton}
-            >
-              <Ionicons name="settings-outline" size={24} color={colors.textSecondary} />
-            </TouchableOpacity>
-            <TouchableOpacity 
-              onPress={() => setShowHistory(!state.showHistory)} 
-              style={styles.headerButton}
-            >
-              <Ionicons 
-                name={state.showHistory ? "list" : "time-outline"} 
-                size={24} 
-                color={colors.textSecondary} 
-              />
-            </TouchableOpacity>
-            <TouchableOpacity onPress={handleLogout} style={styles.headerButton}>
-              <Ionicons name="log-out-outline" size={24} color={colors.textSecondary} />
-            </TouchableOpacity>
-          </View>
-        </View>
 
         {/* Vista de Historial */}
         {state.showHistory ? (
@@ -638,10 +647,12 @@ const useStyles = (colors: Colors) => StyleSheet.create({
     color: colors.textPrimary,
     fontSize: FONTS.size.xlarge,
     fontWeight: FONTS.weight.bold,
+    flexShrink: 0,
   },
   headerActions: {
     flexDirection: 'row',
     gap: SPACING.xs,
+    flexShrink: 0,
   },
   headerButton: {
     padding: SPACING.sm,
