@@ -9,8 +9,8 @@ buildscript {
     ndkVersion = "27.1.12297006"
     buildToolsVersion = "35.0.1"
     
-    // Kotlin version (stable for RN 0.86)
-    kotlinVersion = "2.1.20"
+    // Kotlin version (stable for RN 0.86 / compatible with react-native-iap)
+    kotlinVersion = "1.9.24"
   }
   repositories {
     google()
