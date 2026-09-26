@@ -11,5 +11,6 @@ export interface ITaskRepository {
   update(taskId: string, data: UpdateTaskDTO): Promise<void>;
   completeStep(taskId: string, currentStepIndex: number, totalSteps: number): Promise<CompleteStepResult>;
   goToPreviousStep(taskId: string, currentStepIndex: number): Promise<number>;
+  reactivate(taskId: string): Promise<void>;
   delete(taskId: string): Promise<void>;
 }

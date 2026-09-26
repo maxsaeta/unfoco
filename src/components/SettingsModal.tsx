@@ -6,28 +6,34 @@ import {
   Modal,
   TouchableOpacity,
   ScrollView,
+  Linking,
+  Platform,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { SPACING, FONTS, BORDER_RADIUS, TOUCH_TARGETS } from '../constants/theme';
 import { Colors } from '../constants/theme';
 import { useTheme, ThemeMode } from '../context/ThemeContext';
 import { useLanguage, Language } from '../i18n';
+import { useSubscription } from '../context/SubscriptionContext';
+import { FREE_WORK_MINUTES, FREE_BREAK_MINUTES } from '../constants/business';
 import { TimerSettings, getTimerSettings, saveTimerSettings } from '../services/settingsService';
 
 interface SettingsModalProps {
   visible: boolean;
   onClose: () => void;
   onSave: (settings: TimerSettings) => void;
+  onRequirePremium: () => void;
 }
 
 const WORK_OPTIONS = [15, 20, 25, 30];
 const BREAK_OPTIONS = [3, 5, 10];
 
-export function SettingsModal({ visible, onClose, onSave }: SettingsModalProps) {
+export function SettingsModal({ visible, onClose, onSave, onRequirePremium }: SettingsModalProps) {
   const [workMinutes, setWorkMinutes] = useState(25);
   const [breakMinutes, setBreakMinutes] = useState(5);
   const { colors, themeMode, setThemeMode } = useTheme();
   const { language, setLanguage, t } = useLanguage();
+  const { isPremium } = useSubscription();
   const styles = useStyles(colors);
 
   useEffect(() => {
@@ -49,6 +55,19 @@ export function SettingsModal({ visible, onClose, onSave }: SettingsModalProps) 
     onClose();
   };
 
+  const handleManageSubscription = () => {
+    const packageName = Platform.OS === 'android' ? 'com.unfoco.app' : 'com.unfoco.app';
+    const url = Platform.OS === 'android'
+      ? `market://details?id=${packageName}`
+      : 'https://apps.apple.com/account/subscriptions';
+    Linking.openURL(url).catch(() => {
+      // Fallback for Android if market:// doesn't work
+      if (Platform.OS === 'android') {
+        Linking.openURL('https://play.google.com/store/account/subscriptions');
+      }
+    });
+  };
+
   return (
     <Modal visible={visible} transparent animationType="fade">
       <View style={styles.overlay}>
@@ -65,23 +84,35 @@ export function SettingsModal({ visible, onClose, onSave }: SettingsModalProps) 
             <View style={styles.section}>
               <Text style={styles.sectionTitle}>{t('settings.workDuration')}</Text>
               <View style={styles.optionsRow}>
-                {WORK_OPTIONS.map((minutes) => (
-                  <TouchableOpacity
-                    key={minutes}
-                    style={[
-                      styles.option,
-                      workMinutes === minutes && styles.optionActive,
-                    ]}
-                    onPress={() => setWorkMinutes(minutes)}
-                  >
-                    <Text style={[
-                      styles.optionText,
-                      workMinutes === minutes && styles.optionTextActive,
-                    ]}>
-                      {minutes} min
-                    </Text>
-                  </TouchableOpacity>
-                ))}
+                {WORK_OPTIONS.map((minutes) => {
+                  const locked = !isPremium && minutes !== FREE_WORK_MINUTES;
+                  return (
+                    <TouchableOpacity
+                      key={minutes}
+                      style={[
+                        styles.option,
+                        !locked && workMinutes === minutes && styles.optionActive,
+                      ]}
+                      onPress={() => {
+                        if (locked) {
+                          onRequirePremium();
+                          return;
+                        }
+                        setWorkMinutes(minutes);
+                      }}
+                    >
+                      {locked && (
+                        <Ionicons name="lock-closed" size={12} color={colors.textSecondary} />
+                      )}
+                      <Text style={[
+                        styles.optionText,
+                        !locked && workMinutes === minutes && styles.optionTextActive,
+                      ]}>
+                        {minutes} min
+                      </Text>
+                    </TouchableOpacity>
+                  );
+                })}
               </View>
             </View>
 
@@ -89,23 +120,35 @@ export function SettingsModal({ visible, onClose, onSave }: SettingsModalProps) 
             <View style={styles.section}>
               <Text style={styles.sectionTitle}>{t('settings.breakDuration')}</Text>
               <View style={styles.optionsRow}>
-                {BREAK_OPTIONS.map((minutes) => (
-                  <TouchableOpacity
-                    key={minutes}
-                    style={[
-                      styles.option,
-                      breakMinutes === minutes && styles.optionActive,
-                    ]}
-                    onPress={() => setBreakMinutes(minutes)}
-                  >
-                    <Text style={[
-                      styles.optionText,
-                      breakMinutes === minutes && styles.optionTextActive,
-                    ]}>
-                      {minutes} min
-                    </Text>
-                  </TouchableOpacity>
-                ))}
+                {BREAK_OPTIONS.map((minutes) => {
+                  const locked = !isPremium && minutes !== FREE_BREAK_MINUTES;
+                  return (
+                    <TouchableOpacity
+                      key={minutes}
+                      style={[
+                        styles.option,
+                        !locked && breakMinutes === minutes && styles.optionActive,
+                      ]}
+                      onPress={() => {
+                        if (locked) {
+                          onRequirePremium();
+                          return;
+                        }
+                        setBreakMinutes(minutes);
+                      }}
+                    >
+                      {locked && (
+                        <Ionicons name="lock-closed" size={12} color={colors.textSecondary} />
+                      )}
+                      <Text style={[
+                        styles.optionText,
+                        !locked && breakMinutes === minutes && styles.optionTextActive,
+                      ]}>
+                        {minutes} min
+                      </Text>
+                    </TouchableOpacity>
+                  );
+                })}
               </View>
             </View>
 
@@ -180,6 +223,23 @@ export function SettingsModal({ visible, onClose, onSave }: SettingsModalProps) 
                   </TouchableOpacity>
                 ))}
               </View>
+            </View>
+
+            {/* Subscription Management */}
+            <View style={styles.section}>
+              <Text style={styles.sectionTitle}>{t('settings.subscription')}</Text>
+              <TouchableOpacity style={styles.subscriptionRow} onPress={handleManageSubscription}>
+                <View style={styles.subscriptionIcon}>
+                  <Ionicons name="card-outline" size={20} color={colors.accent} />
+                </View>
+                <View style={styles.subscriptionContent}>
+                  <Text style={styles.subscriptionTitle}>{t('settings.manageSubscription')}</Text>
+                  <Text style={styles.subscriptionSubtitle}>
+                    {isPremium ? t('settings.activePremium') : t('settings.freePlan')}
+                  </Text>
+                </View>
+                <Ionicons name="chevron-forward-outline" size={20} color={colors.textMuted} />
+              </TouchableOpacity>
             </View>
           </ScrollView>
 
@@ -288,5 +348,37 @@ const useStyles = (colors: Colors) => StyleSheet.create({
     color: colors.textPrimary,
     fontSize: FONTS.size.medium,
     fontWeight: FONTS.weight.semibold,
+  },
+  subscriptionRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: SPACING.md,
+    paddingHorizontal: SPACING.md,
+    backgroundColor: colors.background,
+    borderRadius: BORDER_RADIUS.md,
+    borderWidth: 1,
+    borderColor: colors.border,
+  },
+  subscriptionIcon: {
+    width: 40,
+    height: 40,
+    borderRadius: BORDER_RADIUS.sm,
+    backgroundColor: colors.primary,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: SPACING.md,
+  },
+  subscriptionContent: {
+    flex: 1,
+  },
+  subscriptionTitle: {
+    color: colors.textPrimary,
+    fontSize: FONTS.size.medium,
+    fontWeight: FONTS.weight.semibold,
+  },
+  subscriptionSubtitle: {
+    color: colors.textSecondary,
+    fontSize: FONTS.size.xs,
+    marginTop: 2,
   },
 });

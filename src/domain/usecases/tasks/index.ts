@@ -3,3 +3,4 @@ export * from './GetTasks';
 export * from './CompleteStep';
 export * from './DeleteTask';
 export * from './StartTask';
+export * from './ReactivateTask';

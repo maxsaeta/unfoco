@@ -118,7 +118,11 @@
     "light": "Claro",
     "dark": "Oscuro",
     "spanish": "Español",
-    "english": "Inglés"
+    "english": "Inglés",
+    "subscription": "Suscripción",
+    "manageSubscription": "Gestionar suscripción",
+    "activePremium": "Plan Premium activo",
+    "freePlan": "Plan gratis"
   },
   "stats": {
     "title": "📊 Estadísticas",
@@ -162,5 +166,28 @@
   "stateSummary": {
     "inProgress": "Tienes {tasks} tarea(s) con {steps}/{total} pasos completados",
     "welcomeBack": "¡Bienvenido de vuelta!"
+  },
+  "home": {
+    "tasksLimit": "Límite gratis alcanzado · Mejora a Premium"
+  },
+  "premium": {
+    "title": "NeuroPaso Premium",
+    "benefitTitle": "Todo tu potencial, sin límites",
+    "price": "$4.99",
+    "period": "/mes",
+    "benefits": {
+      "unlimitedTasks": "Tareas activas ilimitadas",
+      "aiSteps": "Desglose de tareas con IA",
+      "fullStats": "Estadísticas completas y racha",
+      "customTimer": "Duración de timer a tu medida"
+    },
+    "subscribe": "Suscribirme ahora",
+    "restore": "Restaurar compra",
+    "alreadyPremium": "¡Ya eres Premium!",
+    "alreadyPremiumSubtitle": "Gracias por apoyar NeuroPaso",
+    "purchaseError": "No se pudo completar la compra. Inténtalo de nuevo.",
+    "restoreError": "No se encontraron compras para restaurar.",
+    "close": "Quizás después",
+    "lock": "Solo Premium"
   }
 }

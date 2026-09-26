@@ -1,11 +1,14 @@
-import { ITaskRepository, IAuthRepository, IStatsRepository, ISettingsRepository, IPlanRepository } from '../domain/repositories';
-import { FirebaseTaskRepository, FirebaseAuthRepository, FirebaseStatsRepository, FirebaseSettingsRepository, FirebasePlanRepository } from '../data/repositories';
+import { ITaskRepository, IAuthRepository, IStatsRepository, ISettingsRepository, IPlanRepository, ISubscriptionRepository } from '../domain/repositories';
+import { FirebaseTaskRepository, FirebaseAuthRepository, FirebaseStatsRepository, FirebaseSettingsRepository, FirebasePlanRepository, FirebaseSubscriptionRepository } from '../data/repositories';
+import { GooglePlayPurchaseAdapter } from '../data/purchases/GooglePlayPurchaseAdapter';
+import { PREMIUM_PRODUCT_ID } from '../constants/business';
 
-import { CreateTaskUseCase, GetTasksUseCase, CompleteStepUseCase, DeleteTaskUseCase, StartTaskUseCase } from '../domain/usecases/tasks';
+import { CreateTaskUseCase, GetTasksUseCase, CompleteStepUseCase, DeleteTaskUseCase, StartTaskUseCase, ReactivateTaskUseCase } from '../domain/usecases/tasks';
 import { LoginUseCase, RegisterUseCase, LogoutUseCase, DeleteAccountUseCase, ResetPasswordUseCase } from '../domain/usecases/auth';
 import { IncrementPomodoroUseCase, IncrementTaskCompletedUseCase, GetStatsUseCase } from '../domain/usecases/stats';
 import { GetTimerSettingsUseCase, SaveTimerSettingsUseCase } from '../domain/usecases/settings';
 import { GetDailyPrioritiesUseCase, SaveDailyPrioritiesUseCase, SaveMoodUseCase, GetMoodHistoryUseCase, SaveShutdownChecklistUseCase, GetShutdownChecklistUseCase } from '../domain/usecases/plan';
+import { GetSubscriptionUseCase, PurchaseSubscriptionUseCase, RestorePurchasesUseCase } from '../domain/usecases/subscriptions';
 
 class Container {
   private static instance: Container;
@@ -15,6 +18,7 @@ class Container {
   private _statsRepository: IStatsRepository;
   private _settingsRepository: ISettingsRepository;
   private _planRepository: IPlanRepository;
+  private _subscriptionRepository: ISubscriptionRepository;
 
   private constructor() {
     this._taskRepository = new FirebaseTaskRepository();
@@ -22,6 +26,10 @@ class Container {
     this._statsRepository = new FirebaseStatsRepository();
     this._settingsRepository = new FirebaseSettingsRepository();
     this._planRepository = new FirebasePlanRepository();
+    this._subscriptionRepository = new FirebaseSubscriptionRepository();
+    this._subscriptionRepository.setPurchaseAdapter(
+      new GooglePlayPurchaseAdapter([PREMIUM_PRODUCT_ID])
+    );
   }
 
   static getInstance(): Container {
@@ -52,6 +60,10 @@ class Container {
     return this._planRepository;
   }
 
+  get subscriptionRepository(): ISubscriptionRepository {
+    return this._subscriptionRepository;
+  }
+
   // Use Cases - Tasks
   get createTaskUseCase(): CreateTaskUseCase {
     return new CreateTaskUseCase(this._taskRepository);
@@ -71,6 +83,10 @@ class Container {
 
   get deleteTaskUseCase(): DeleteTaskUseCase {
     return new DeleteTaskUseCase(this._taskRepository);
+  }
+
+  get reactivateTaskUseCase(): ReactivateTaskUseCase {
+    return new ReactivateTaskUseCase(this._taskRepository);
   }
 
   // Use Cases - Auth
@@ -139,6 +155,19 @@ class Container {
 
   get getShutdownChecklistUseCase(): GetShutdownChecklistUseCase {
     return new GetShutdownChecklistUseCase(this._planRepository);
+  }
+
+  // Use Cases - Subscriptions
+  get getSubscriptionUseCase(): GetSubscriptionUseCase {
+    return new GetSubscriptionUseCase(this._subscriptionRepository);
+  }
+
+  get purchaseSubscriptionUseCase(): PurchaseSubscriptionUseCase {
+    return new PurchaseSubscriptionUseCase(this._subscriptionRepository);
+  }
+
+  get restorePurchasesUseCase(): RestorePurchasesUseCase {
+    return new RestorePurchasesUseCase(this._subscriptionRepository);
   }
 }
 

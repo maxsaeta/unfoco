@@ -8,6 +8,7 @@ import {
   ActivityIndicator,
   ScrollView,
   Platform,
+  Linking,
   Animated
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -18,6 +19,7 @@ import { useTheme } from '../../context/ThemeContext';
 import { useLanguage } from '../../i18n';
 import { Timer } from '../../components/Timer';
 import { SwipeableTask } from '../../components/SwipeableTask';
+import { PaywallModal } from '../../components/PaywallModal';
 import { AddTaskModal } from '../../components/AddTaskModal';
 import { EditTaskModal } from '../../components/EditTaskModal';
 import { SettingsModal } from '../../components/SettingsModal';
@@ -33,6 +35,7 @@ import { useHomeViewModel } from './HomeViewModel';
 import { registerForPushNotifications } from '../../services/notificationService';
 import { container } from '../../di/container';
 import { auth } from '../../config/firebase';
+import { FREE_MAX_ACTIVE_TASKS } from '../../constants/business';
 
 const isWeb = Platform.OS === 'web';
 
@@ -42,6 +45,8 @@ export function HomeScreen() {
     activeTasks,
     completedTasks,
     currentTask,
+    isPremium,
+    canAddTask,
     setCurrentTaskIndex,
     setShowAddModal,
     setShowEditModal,
@@ -54,6 +59,7 @@ export function HomeScreen() {
     setShowBrainDump,
     setShowShutdownRitual,
     setShowMoodTracker,
+    setShowPaywall,
     setTaskToEdit,
     handleAddTask,
     handleStartTask,
@@ -108,9 +114,21 @@ export function HomeScreen() {
   const handleCompleteStepWithCelebration = async () => {
     const result = await handleCompleteStep();
     if (result) {
+      if (result === 'task') {
+        timer.reset();
+      }
       showCelebration(result);
     }
   };
+
+  // Si no queda ninguna tarea activa (se completó/borró la última),
+  // detener el pomodoro y volverlo al tiempo máximo sin importar el camino.
+  React.useEffect(() => {
+    if (!currentTask) {
+      timer.reset();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentTask]);
 
   const timer = useTimer({
     workMinutes: state.timerSettings.workMinutes,
@@ -168,13 +186,44 @@ export function HomeScreen() {
     }, 3000);
   };
 
-  const handleLongPressEnd = () => {
-    if (longPressTimerRef.current) {
-      clearTimeout(longPressTimerRef.current);
-      longPressTimerRef.current = null;
+  const historyLastTapRef = useRef<{ taskId: string; time: number } | null>(null);
+
+  const handleHistoryDoubleTap = (taskId: string, taskTitle: string) => {
+    const now = Date.now();
+    const lastTap = historyLastTapRef.current;
+    
+    if (lastTap && lastTap.taskId === taskId && (now - lastTap.time) < 300) {
+      // Double tap detected
+      historyLastTapRef.current = null;
+      Alert.alert(
+        'Opciones',
+        `¿Qué deseas hacer con "${taskTitle}"?`,
+        [
+          { text: 'Cancelar', style: 'cancel' },
+          { 
+            text: 'Marcar como no cumplida', 
+            onPress: () => handleReactivateTask(taskId)
+          },
+          { 
+            text: 'Borrar tarea', 
+            style: 'destructive',
+            onPress: () => handleDeleteTask(taskId)
+          }
+        ]
+      );
+    } else {
+      historyLastTapRef.current = { taskId, time: now };
     }
   };
 
+  const handleReactivateTask = async (taskId: string) => {
+    try {
+      await container.reactivateTaskUseCase.execute(taskId);
+    } catch (error) {
+      console.error('Error reactivating task:', error);
+      Alert.alert('Error', 'No se pudo reactivar la tarea');
+    }
+  };
   const onEditTask = (task: any) => {
     setTaskToEdit(task);
     setShowEditModal(true);
@@ -322,9 +371,7 @@ export function HomeScreen() {
                   <TouchableOpacity
                     key={task.id}
                     style={styles.historyItem}
-                    onLongPress={() => handleLongPressStart(task.id!, task.title)}
-                    onPressOut={handleLongPressEnd}
-                    delayLongPress={3000}
+                    onPress={() => handleHistoryDoubleTap(task.id!, task.title)}
                   >
                     <Ionicons name="checkmark-circle" size={24} color={colors.success} />
                     <View style={styles.historyItemContent}>
@@ -437,11 +484,26 @@ export function HomeScreen() {
                 {/* Botón Agregar */}
                 <TouchableOpacity 
                   style={styles.addButton}
-                  onPress={() => setShowAddModal(true)}
+                  onPress={() => {
+                    if (canAddTask) {
+                      setShowAddModal(true);
+                    } else {
+                      setShowPaywall(true);
+                    }
+                  }}
                 >
                   <Ionicons name="add" size={28} color={colors.textPrimary} />
                 </TouchableOpacity>
               </View>
+
+              {/* Límite de tareas gratis */}
+              {!isPremium && activeTasks.length >= FREE_MAX_ACTIVE_TASKS && (
+                <TouchableOpacity style={styles.limitHint} onPress={() => setShowPaywall(true)}>
+                  <Ionicons name="lock-closed" size={14} color={colors.warning} />
+                  <Text style={styles.limitHintText}>{t('home.tasksLimit')}</Text>
+                  <Ionicons name="diamond" size={16} color={colors.warning} />
+                </TouchableOpacity>
+              )}
             </View>
 
             {/* Quick Actions - Brain Dump, Shutdown, Mood */}
@@ -497,6 +559,12 @@ export function HomeScreen() {
                 </TouchableOpacity>
                 <TouchableOpacity 
                   style={styles.footerLink}
+                  onPress={() => Linking.openURL('https://play.google.com/store/account/subscriptions')}
+                >
+                  <Text style={styles.footerLinkText}>Gestionar Suscripción</Text>
+                </TouchableOpacity>
+                <TouchableOpacity 
+                  style={styles.footerLink}
                   onPress={() => setShowDeleteAccountModal(true)}
                 >
                   <Text style={[styles.footerLinkText, styles.footerLinkDanger]}>Eliminar Cuenta</Text>
@@ -543,6 +611,7 @@ export function HomeScreen() {
         visible={state.showAddModal}
         onClose={() => setShowAddModal(false)}
         onAdd={handleAddTask}
+        onRequirePremium={() => setShowPaywall(true)}
       />
 
       {/* Modal Modificar Tarea */}
@@ -554,6 +623,7 @@ export function HomeScreen() {
           setTaskToEdit(null);
         }}
         onUpdate={onUpdateTask}
+        onRequirePremium={() => setShowPaywall(true)}
       />
 
       {/* Modal Configuración */}
@@ -561,12 +631,14 @@ export function HomeScreen() {
         visible={state.showSettingsModal}
         onClose={() => setShowSettingsModal(false)}
         onSave={handleSettingsSave}
+        onRequirePremium={() => setShowPaywall(true)}
       />
 
       {/* Modal Estadísticas */}
       <StatsModal
         visible={state.showStatsModal}
         onClose={() => setShowStatsModal(false)}
+        onRequirePremium={() => setShowPaywall(true)}
       />
 
       {/* Modal Política de Privacidad */}
@@ -608,6 +680,12 @@ export function HomeScreen() {
       <MoodTracker
         visible={state.showMoodTracker}
         onClose={() => setShowMoodTracker(false)}
+      />
+
+      {/* Modal Premium */}
+      <PaywallModal
+        visible={state.showPaywall}
+        onClose={() => setShowPaywall(false)}
       />
     </SafeAreaView>
   );
@@ -791,6 +869,19 @@ const useStyles = (colors: Colors) => StyleSheet.create({
     backgroundColor: colors.accent,
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  limitHint: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: SPACING.xs,
+    marginTop: SPACING.sm,
+    paddingVertical: SPACING.sm,
+  },
+  limitHintText: {
+    color: colors.warning,
+    fontSize: FONTS.size.xsmall,
+    fontWeight: FONTS.weight.semibold,
   },
   skipBreakButton: {
     flexDirection: 'row',

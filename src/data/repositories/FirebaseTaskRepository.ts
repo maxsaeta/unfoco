@@ -146,6 +146,16 @@ export class FirebaseTaskRepository implements ITaskRepository {
     return previousIndex;
   }
 
+  async reactivate(taskId: string): Promise<void> {
+    const taskRef = doc(db, COLLECTION_NAME, taskId);
+    await updateDoc(taskRef, {
+      completed: false,
+      completedAt: null,
+      currentStepIndex: 0,
+      startedAt: Timestamp.now(),
+    });
+  }
+
   async delete(taskId: string): Promise<void> {
     await deleteDoc(doc(db, COLLECTION_NAME, taskId));
   }

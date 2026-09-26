@@ -24,7 +24,10 @@
       },
       "package": "com.unpaso.app",
       "googleServicesFile": "./google-services.json",
-      "useNextNotificationsApi": true
+      "useNextNotificationsApi": true,
+      "permissions": [
+        "com.android.vending.BILLING"
+      ]
     },
     "web": {
       "favicon": "./assets/favicon.png"
@@ -36,6 +39,12 @@
           "icon": "./assets/icon.png",
           "color": "#e94560",
           "mode": "production"
+        }
+      ],
+      [
+        "react-native-iap",
+        {
+          "paymentProvider": "Play Store"
         }
       ]
     ]

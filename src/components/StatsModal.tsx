@@ -11,16 +11,18 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 import { SPACING, FONTS, Colors } from '../constants/theme';
 import { useTheme } from '../context/ThemeContext';
+import { useSubscription } from '../context/SubscriptionContext';
 import { getWeeklyStats, getTotalStats, DailyStats } from '../services/statsService';
 
 interface StatsModalProps {
   visible: boolean;
   onClose: () => void;
+  onRequirePremium: () => void;
 }
 
 const DAY_NAMES = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'];
 
-export function StatsModal({ visible, onClose }: StatsModalProps) {
+export function StatsModal({ visible, onClose, onRequirePremium }: StatsModalProps) {
   const [weeklyStats, setWeeklyStats] = useState<DailyStats[]>([]);
   const [totalStats, setTotalStats] = useState({
     totalPomodoros: 0,
@@ -30,6 +32,7 @@ export function StatsModal({ visible, onClose }: StatsModalProps) {
   });
   const [loading, setLoading] = useState(true);
   const { colors } = useTheme();
+  const { isPremium } = useSubscription();
 
   const styles = useStyles(colors);
 
@@ -37,13 +40,16 @@ export function StatsModal({ visible, onClose }: StatsModalProps) {
     if (visible) {
       loadStats();
     }
-  }, [visible]);
+  }, [visible, isPremium]);
 
   const loadStats = async () => {
     setLoading(true);
-    const [weekly, total] = await Promise.all([getWeeklyStats(), getTotalStats()]);
+    const weekly = await getWeeklyStats();
     setWeeklyStats(weekly);
-    setTotalStats(total);
+    if (isPremium) {
+      const total = await getTotalStats();
+      setTotalStats(total);
+    }
     setLoading(false);
   };
 
@@ -74,29 +80,42 @@ export function StatsModal({ visible, onClose }: StatsModalProps) {
             <ActivityIndicator size="large" color={colors.accent} style={styles.loader} />
           ) : (
             <ScrollView showsVerticalScrollIndicator={false}>
-              {/* Summary Cards */}
-              <View style={styles.summaryGrid}>
-                <View style={styles.summaryCard}>
-                  <Ionicons name="flame" size={28} color={colors.accent} />
-                  <Text style={styles.summaryValue}>{totalStats.streak}</Text>
-                  <Text style={styles.summaryLabel}>Racha días</Text>
-                </View>
-                <View style={styles.summaryCard}>
-                  <Ionicons name="timer" size={28} color={colors.warning} />
-                  <Text style={styles.summaryValue}>{totalStats.totalPomodoros}</Text>
-                  <Text style={styles.summaryLabel}>Pomodoros</Text>
-                </View>
-                <View style={styles.summaryCard}>
-                  <Ionicons name="checkmark-circle" size={28} color={colors.success} />
-                  <Text style={styles.summaryValue}>{totalStats.totalTasks}</Text>
-                  <Text style={styles.summaryLabel}>Tareas</Text>
-                </View>
-                <View style={styles.summaryCard}>
-                  <Ionicons name="time" size={28} color={colors.primary} />
-                  <Text style={styles.summaryValue}>{formatHours(totalStats.totalMinutes)}</Text>
-                  <Text style={styles.summaryLabel}>Enfoque total</Text>
-                </View>
-              </View>
+              {isPremium ? (
+                <>
+                  {/* Summary Cards */}
+                  <View style={styles.summaryGrid}>
+                    <View style={styles.summaryCard}>
+                      <Ionicons name="flame" size={28} color={colors.accent} />
+                      <Text style={styles.summaryValue}>{totalStats.streak}</Text>
+                      <Text style={styles.summaryLabel}>Racha días</Text>
+                    </View>
+                    <View style={styles.summaryCard}>
+                      <Ionicons name="timer" size={28} color={colors.warning} />
+                      <Text style={styles.summaryValue}>{totalStats.totalPomodoros}</Text>
+                      <Text style={styles.summaryLabel}>Pomodoros</Text>
+                    </View>
+                    <View style={styles.summaryCard}>
+                      <Ionicons name="checkmark-circle" size={28} color={colors.success} />
+                      <Text style={styles.summaryValue}>{totalStats.totalTasks}</Text>
+                      <Text style={styles.summaryLabel}>Tareas</Text>
+                    </View>
+                    <View style={styles.summaryCard}>
+                      <Ionicons name="time" size={28} color={colors.primary} />
+                      <Text style={styles.summaryValue}>{formatHours(totalStats.totalMinutes)}</Text>
+                      <Text style={styles.summaryLabel}>Enfoque total</Text>
+                    </View>
+                  </View>
+                </>
+              ) : (
+                <TouchableOpacity style={styles.upgradeCard} onPress={onRequirePremium}>
+                  <Ionicons name="diamond" size={24} color={colors.warning} />
+                  <View style={styles.upgradeTextWrap}>
+                    <Text style={styles.upgradeTitle}>Estadísticas completas</Text>
+                    <Text style={styles.upgradeSubtitle}>Desbloquea totales, racha e historial completo</Text>
+                  </View>
+                  <Ionicons name="chevron-forward" size={20} color={colors.textSecondary} />
+                </TouchableOpacity>
+              )}
 
               {/* Weekly Chart */}
               <View style={styles.chartSection}>
@@ -198,6 +217,30 @@ const useStyles = (colors: Colors) => StyleSheet.create({
   },
   loader: {
     paddingVertical: SPACING.xxl,
+  },
+  upgradeCard: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: SPACING.md,
+    backgroundColor: colors.background,
+    borderRadius: 12,
+    padding: SPACING.md,
+    marginBottom: SPACING.lg,
+    borderWidth: 1,
+    borderColor: colors.warning,
+  },
+  upgradeTextWrap: {
+    flex: 1,
+    gap: 2,
+  },
+  upgradeTitle: {
+    color: colors.textPrimary,
+    fontSize: FONTS.size.medium,
+    fontWeight: '600',
+  },
+  upgradeSubtitle: {
+    color: colors.textSecondary,
+    fontSize: FONTS.size.small,
   },
   summaryGrid: {
     flexDirection: 'row',

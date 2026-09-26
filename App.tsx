@@ -6,6 +6,7 @@ import { HomeScreen } from './src/presentation/screens/HomeScreen';
 import { LoginScreen } from './src/presentation/screens/LoginScreen';
 import { useAuth } from './src/hooks/useAuth';
 import { ThemeProvider, useTheme } from './src/context/ThemeContext';
+import { SubscriptionProvider } from './src/context/SubscriptionContext';
 import { LanguageProvider } from './src/i18n';
 import * as Font from 'expo-font';
 import Ionicons from '@expo/vector-icons/Ionicons';
@@ -36,7 +37,9 @@ function AppContent({ fontsLoaded }: { fontsLoaded: boolean }) {
   return (
     <SafeAreaProvider>
       <StatusBar style={isDark ? 'light' : 'dark'} />
-      <HomeScreen />
+      <SubscriptionProvider userId={user.uid}>
+        <HomeScreen />
+      </SubscriptionProvider>
     </SafeAreaProvider>
   );
 }

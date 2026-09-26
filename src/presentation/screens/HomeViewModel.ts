@@ -2,6 +2,8 @@ import { useState, useEffect, useCallback, useMemo } from 'react';
 import { container } from '../../di/container';
 import { Task, TimerSettings, DailyPriorities } from '../../domain/types';
 import { auth } from '../../config/firebase';
+import { useSubscription } from '../../context/SubscriptionContext';
+import { FREE_MAX_ACTIVE_TASKS } from '../../constants/business';
 
 export type CelebrationType = 'step' | 'task' | null;
 
@@ -26,6 +28,7 @@ export interface HomeState {
   showBrainDump: boolean;
   showShutdownRitual: boolean;
   showMoodTracker: boolean;
+  showPaywall: boolean;
   taskToEdit: Task | null;
   dailyPriorities: DailyPriorities | null;
 }
@@ -47,9 +50,12 @@ export function useHomeViewModel() {
     showBrainDump: false,
     showShutdownRitual: false,
     showMoodTracker: false,
+    showPaywall: false,
     taskToEdit: null,
     dailyPriorities: null,
   });
+
+  const { isPremium } = useSubscription();
 
   // Ordenar tareas: prioridades primero, luego el resto
   const activeTasks = useMemo(() => {
@@ -83,6 +89,7 @@ export function useHomeViewModel() {
 
   const completedTasks = state.tasks.filter(task => task.completed);
   const currentTask = activeTasks.length > 0 ? activeTasks[state.currentTaskIndex] || null : null;
+  const canAddTask = isPremium || activeTasks.length < FREE_MAX_ACTIVE_TASKS;
 
   useEffect(() => {
     loadSettings();
@@ -161,19 +168,29 @@ export function useHomeViewModel() {
     setState(prev => ({ ...prev, showMoodTracker: show }));
   }, []);
 
+  const setShowPaywall = useCallback((show: boolean) => {
+    setState(prev => ({ ...prev, showPaywall: show }));
+  }, []);
+
   const setTaskToEdit = useCallback((task: Task | null) => {
     setState(prev => ({ ...prev, taskToEdit: task }));
   }, []);
 
-  const handleAddTask = async (taskTitle: string, steps: { title: string; description: string }[]) => {
+  const handleAddTask = async (taskTitle: string, steps: { title: string; description: string }[]): Promise<boolean> => {
     const userId = auth.currentUser?.uid;
-    if (!userId) return;
+    if (!userId) return false;
+
+    if (!isPremium && activeTasks.length >= FREE_MAX_ACTIVE_TASKS) {
+      return false;
+    }
 
     await container.createTaskUseCase.execute(userId, {
       title: taskTitle,
       steps,
       order: state.tasks.length,
     });
+
+    return true;
   };
 
   const handleCompleteStep = async (): Promise<CelebrationType> => {
@@ -227,6 +244,8 @@ export function useHomeViewModel() {
     activeTasks,
     completedTasks,
     currentTask,
+    isPremium,
+    canAddTask,
     setCurrentTaskIndex,
     setShowAddModal,
     setShowEditModal,
@@ -239,6 +258,7 @@ export function useHomeViewModel() {
     setShowBrainDump,
     setShowShutdownRitual,
     setShowMoodTracker,
+    setShowPaywall,
     setTaskToEdit,
     handleAddTask,
     handleStartTask,

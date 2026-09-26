@@ -118,7 +118,11 @@
     "light": "Light",
     "dark": "Dark",
     "spanish": "Spanish",
-    "english": "English"
+    "english": "English",
+    "subscription": "Subscription",
+    "manageSubscription": "Manage subscription",
+    "activePremium": "Premium plan active",
+    "freePlan": "Free plan"
   },
   "stats": {
     "title": "📊 Statistics",
@@ -162,5 +166,28 @@
   "stateSummary": {
     "inProgress": "You have {tasks} task(s) with {steps}/{total} steps completed",
     "welcomeBack": "Welcome back!"
+  },
+  "home": {
+    "tasksLimit": "Free limit reached · Upgrade to Premium"
+  },
+  "premium": {
+    "title": "NeuroPaso Premium",
+    "benefitTitle": "Your full potential, no limits",
+    "price": "$4.99",
+    "period": "/month",
+    "benefits": {
+      "unlimitedTasks": "Unlimited active tasks",
+      "aiSteps": "AI task breakdown",
+      "fullStats": "Full statistics and streak",
+      "customTimer": "Custom timer durations"
+    },
+    "subscribe": "Subscribe now",
+    "restore": "Restore purchase",
+    "alreadyPremium": "You're Premium!",
+    "alreadyPremiumSubtitle": "Thanks for supporting NeuroPaso",
+    "purchaseError": "Couldn't complete the purchase. Try again.",
+    "restoreError": "No purchases found to restore.",
+    "close": "Maybe later",
+    "lock": "Premium only"
   }
 }

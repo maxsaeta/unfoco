@@ -18,20 +18,23 @@ import { useTheme } from '../context/ThemeContext';
 import { Task, TaskStep } from '../domain/types';
 import { generateTaskSteps } from '../services/aiService';
 import { container } from '../di/container';
+import { useSubscription } from '../context/SubscriptionContext';
 
 interface EditTaskModalProps {
   visible: boolean;
   task: Task | null;
   onClose: () => void;
   onUpdate: (updatedTask: Task) => void;
+  onRequirePremium: () => void;
 }
 
-export function EditTaskModal({ visible, task, onClose, onUpdate }: EditTaskModalProps) {
+export function EditTaskModal({ visible, task, onClose, onUpdate, onRequirePremium }: EditTaskModalProps) {
   const [title, setTitle] = useState('');
   const [steps, setSteps] = useState<TaskStep[]>([]);
   const [loadingAI, setLoadingAI] = useState(false);
 
   const { colors } = useTheme();
+  const { isPremium } = useSubscription();
   const styles = useStyles(colors);
 
   useEffect(() => {
@@ -95,6 +98,11 @@ export function EditTaskModal({ visible, task, onClose, onUpdate }: EditTaskModa
       return;
     }
 
+    if (!isPremium) {
+      onRequirePremium();
+      return;
+    }
+
     setLoadingAI(true);
     try {
       const aiSteps = await generateTaskSteps(title.trim());
@@ -153,10 +161,10 @@ export function EditTaskModal({ visible, task, onClose, onUpdate }: EditTaskModa
             {loadingAI ? (
               <ActivityIndicator color={colors.accent} size="small" />
             ) : (
-              <Ionicons name="sparkles" size={20} color={colors.accent} />
+              <Ionicons name={isPremium ? 'sparkles' : 'lock-closed'} size={20} color={colors.accent} />
             )}
             <Text style={styles.aiButtonText}>
-              {loadingAI ? 'Generando...' : 'Regenerar pasos con IA'}
+              {loadingAI ? 'Generando...' : (isPremium ? 'Regenerar pasos con IA' : 'Desbloquear con IA')}
             </Text>
           </TouchableOpacity>
 

@@ -7,6 +7,8 @@ ios/
 *.p8
 *.p12
 *.key
+*.keystore
+keystore.properties
 *.mobileprovision
 *.orig.*
 web-build/
@@ -20,3 +22,7 @@ serviceAccountKey.json
 *.log
 npm-debug.log*
 yarn.lock
+
+# Secrets
+/key
+dist-web/

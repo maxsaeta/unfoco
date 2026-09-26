@@ -154,7 +154,7 @@ export function SwipeableTask({
       <View style={styles.taskHeader}>
         <Text style={styles.taskTitle}>{task.title}</Text>
         <Text style={styles.taskProgress}>
-          {t('task.stepProgress', { current: completedSteps + 1, total: task.steps.length })}
+          {t('task.stepProgress', { current: currentIndex + 1, total: task.steps.length })}
         </Text>
       </View>
 
@@ -171,7 +171,7 @@ export function SwipeableTask({
       <ScrollView style={styles.stepScroll} nestedScrollEnabled={true}>
         <View style={styles.stepCard}>
           <View style={styles.stepIndicator}>
-            <Text style={styles.stepNumber}>{completedSteps + 1}</Text>
+            <Text style={styles.stepNumber}>{currentIndex + 1}</Text>
           </View>
           <View style={styles.stepContent}>
             <Text style={styles.stepTitle}>{currentStep.title}</Text>

@@ -1,95 +1,113 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 500" width="1024" height="500">
   <defs>
     <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" style="stop-color:#1a1a2e;stop-opacity:1" />
-      <stop offset="100%" style="stop-color:#16213e;stop-opacity:1" />
+      <stop offset="0%" style="stop-color:#1a1120;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#2b1f2e;stop-opacity:1" />
     </linearGradient>
     <linearGradient id="accentGrad" x1="0%" y1="0%" x2="100%" y2="0%">
-      <stop offset="0%" style="stop-color:#00BCD4;stop-opacity:1" />
-      <stop offset="100%" style="stop-color:#00E5FF;stop-opacity:1" />
+      <stop offset="0%" style="stop-color:#e84057;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#c4c8ff;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="ringGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#e84057;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#c440ff;stop-opacity:1" />
     </linearGradient>
   </defs>
-  
+
   <!-- Background -->
   <rect width="1024" height="500" fill="url(#bgGrad)"/>
-  
+
   <!-- Decorative circles -->
-  <circle cx="100" cy="400" r="200" fill="#00BCD4" opacity="0.05"/>
-  <circle cx="900" cy="100" r="150" fill="#00BCD4" opacity="0.05"/>
-  
-  <!-- Logo icon (left side) -->
-  <g transform="translate(200, 250) scale(0.8)">
-    <!-- Outer ring -->
-    <circle cx="0" cy="0" r="120" fill="none" stroke="url(#accentGrad)" stroke-width="6" stroke-linecap="round" stroke-dasharray="80 20 40 20"/>
-    
-    <!-- U shape -->
-    <path d="M -60 -30 
-             L -60 50 
-             Q -60 100 0 100 
-             L 60 100 
-             Q 120 100 120 50 
-             L 120 -30" 
-          fill="none" 
-          stroke="url(#accentGrad)" 
-          stroke-width="24" 
-          stroke-linecap="round"
-          stroke-linejoin="round"/>
-    
-    <!-- Check -->
-    <path d="M -20 20 
-             L 10 50 
-             L 60 -10" 
-          fill="none" 
-          stroke="#FFFFFF" 
-          stroke-width="16" 
-          stroke-linecap="round"
-          stroke-linejoin="round"/>
-    
-    <!-- Arrow -->
-    <path d="M 130 35 
-             L 180 35 
-             L 180 15 
-             L 210 45 
-             L 180 75 
-             L 180 55 
-             L 130 55" 
-          fill="#00E5FF" 
-          stroke="none"/>
+  <circle cx="120" cy="460" r="240" fill="#e84057" opacity="0.05"/>
+  <circle cx="930" cy="70" r="180" fill="#c4c8ff" opacity="0.05"/>
+  <circle cx="760" cy="500" r="220" fill="#ece0e7" opacity="0.03"/>
+
+  <!-- App icon (left) - rounded container with the U mark -->
+  <g transform="translate(130, 145)">
+    <!-- Rounded container background -->
+    <rect x="0" y="0" width="200" height="200" rx="48" fill="#140c18"/>
+    <rect x="0" y="0" width="200" height="200" rx="48" fill="none" stroke="#e84057" stroke-width="3"/>
+
+    <!-- The U mark (from logo.svg, recolored) -->
+    <g transform="translate(100, 190) scale(0.42)">
+      <!-- Outer ring - timer reference -->
+      <circle cx="0" cy="0" r="190" fill="none" stroke="url(#ringGrad)" stroke-width="10" stroke-linecap="round" stroke-dasharray="90 22 45 22"/>
+
+      <!-- Stylized U shape -->
+      <path d="M -130 -90 
+               L -130 110 
+               Q -130 200 -10 200 
+               L 134 200 
+               Q 254 200 254 110 
+               L 254 -90" 
+           fill="none" 
+           stroke="url(#accentGrad)" 
+           stroke-width="22" 
+           stroke-linecap="round"
+           stroke-linejoin="round"/>
+
+      <!-- Arrow pointing right (progress) -->
+      <path d="M 270 100 
+               L 340 100 
+               L 340 70 
+               L 400 130 
+               L 340 190 
+               L 340 160 
+               L 270 160" 
+           fill="#c4c8ff" 
+           stroke="none"/>
+
+      <!-- Check mark inside U -->
+      <path d="M -30 40 
+               L 30 100 
+               L 130 -30" 
+           fill="none" 
+           stroke="#FFFFFF" 
+           stroke-width="14" 
+           stroke-linecap="round"
+           stroke-linejoin="round"/>
+    </g>
   </g>
-  
+
   <!-- App name (right side) -->
-  <text x="550" y="180" 
-        font-family="Arial, Helvetica, sans-serif" 
-        font-size="80" 
+  <text x="400" y="140" 
+        font-family="Segoe UI, Arial, Helvetica, sans-serif" 
+        font-size="64" 
         font-weight="bold" 
-        fill="#FFFFFF">UNPASO</text>
-  
+        fill="#ece0e7">NeuroPaso</text>
+
   <!-- Tagline -->
-  <text x="550" y="260" 
-        font-family="Arial, Helvetica, sans-serif" 
-        font-size="32" 
-        fill="#00BCD4">Una tarea a la vez</text>
-  
-  <!-- Features -->
-  <text x="550" y="330" 
-        font-family="Arial, Helvetica, sans-serif" 
-        font-size="24" 
-        fill="#a0a0a0">• Temporizador Pomodoro</text>
-  <text x="550" y="370" 
-        font-family="Arial, Helvetica, sans-serif" 
-        font-size="24" 
-        fill="#a0a0a0">• Generación de pasos con IA</text>
-  <text x="550" y="410" 
-        font-family="Arial, Helvetica, sans-serif" 
-        font-size="24" 
-        fill="#a0a0a0">• Estadísticas de productividad</text>
-  
-  <!-- ADHD badge -->
-  <rect x="550" y="440" width="200" height="36" rx="18" fill="#e94560"/>
-  <text x="650" y="465" 
-        font-family="Arial, Helvetica, sans-serif" 
-        font-size="16" 
-        font-weight="bold"
-        fill="#FFFFFF" 
-        text-anchor="middle">Diseñado para TDAH</text>
+  <text x="400" y="210" 
+        font-family="Segoe UI, Arial, Helvetica, sans-serif" 
+        font-size="30" 
+        fill="#e84057">Un paso a la vez</text>
+
+  <!-- Features with check circles -->
+  <g font-family="Segoe UI, Arial, Helvetica, sans-serif" font-size="20" fill="#d0c2cc">
+    <!-- Bullet 1 -->
+    <circle cx="408" cy="275" r="16" fill="#4ade80"/>
+    <text x="408" y="280" font-size="12" font-weight="bold" fill="#000000" text-anchor="middle">✓</text>
+    <text x="440" y="282">Pomodoro de 25 minutos</text>
+
+    <!-- Bullet 2 -->
+    <circle cx="408" cy="325" r="16" fill="#4ade80"/>
+    <text x="408" y="330" font-size="12" font-weight="bold" fill="#000000" text-anchor="middle">✓</text>
+    <text x="440" y="332">Tareas divididas con IA</text>
+
+    <!-- Bullet 3 -->
+    <circle cx="408" cy="375" r="16" fill="#4ade80"/>
+    <text x="408" y="380" font-size="12" font-weight="bold" fill="#000000" text-anchor="middle">✓</text>
+    <text x="440" y="382">Progreso y rachas diarias</text>
+  </g>
+
+  <!-- CTA Pill -->
+  <g transform="translate(400, 420)">
+    <rect x="0" y="0" width="280" height="52" rx="26" fill="#e84057"/>
+    <text x="140" y="34" 
+          font-family="Segoe UI, Arial, Helvetica, sans-serif" 
+          font-size="18" 
+          font-weight="bold" 
+          fill="#ffffff" 
+          text-anchor="middle">EMPEZAR GRATIS</text>
+  </g>
 </svg>

@@ -16,12 +16,14 @@ import { Ionicons } from '@expo/vector-icons';
 import { SPACING, FONTS, BORDER_RADIUS, TOUCH_TARGETS } from '../constants/theme';
 import { Colors } from '../constants/theme';
 import { useTheme } from '../context/ThemeContext';
+import { useSubscription } from '../context/SubscriptionContext';
 import { generateTaskSteps, TaskStep } from '../services/aiService';
 
 interface AddTaskModalProps {
   visible: boolean;
   onClose: () => void;
-  onAdd: (title: string, steps: { title: string; description: string }[]) => void;
+  onAdd: (title: string, steps: { title: string; description: string }[]) => Promise<boolean>;
+  onRequirePremium: () => void;
 }
 
 function useStyles(colors: Colors) {
@@ -181,19 +183,25 @@ function useStyles(colors: Colors) {
   });
 }
 
-export function AddTaskModal({ visible, onClose, onAdd }: AddTaskModalProps) {
+export function AddTaskModal({ visible, onClose, onAdd, onRequirePremium }: AddTaskModalProps) {
   const [title, setTitle] = useState('');
-  const [manualStep, setManualStep] = useState('');
+  const [manualSteps, setManualSteps] = useState<{ title: string; description: string }[]>([]);
   const [aiSteps, setAiSteps] = useState<TaskStep[]>([]);
   const [selectedSteps, setSelectedSteps] = useState<Set<number>>(new Set());
   const [loadingAI, setLoadingAI] = useState(false);
 
   const { colors } = useTheme();
+  const { isPremium } = useSubscription();
   const styles = useStyles(colors);
 
   const handleGenerateSteps = async () => {
     if (!title.trim()) {
       Alert.alert('Error', 'Escribe primero el nombre de la tarea');
+      return;
+    }
+
+    if (!isPremium) {
+      onRequirePremium();
       return;
     }
 
@@ -221,7 +229,7 @@ export function AddTaskModal({ visible, onClose, onAdd }: AddTaskModalProps) {
     setSelectedSteps(newSelected);
   };
 
-  const handleAdd = () => {
+  const handleAdd = async () => {
     if (!title.trim()) {
       Alert.alert('Error', 'Escribe el nombre de la tarea');
       return;
@@ -236,24 +244,32 @@ export function AddTaskModal({ visible, onClose, onAdd }: AddTaskModalProps) {
       }
     });
 
-    // Agregar paso manual si existe
-    if (manualStep.trim()) {
-      stepsToAdd.push({ title: manualStep.trim(), description: '' });
-    }
+    // Agregar pasos manuales
+    manualSteps.forEach(step => {
+      if (step.title.trim()) {
+        stepsToAdd.push({ title: step.title.trim(), description: step.description });
+      }
+    });
 
     if (stepsToAdd.length === 0) {
       Alert.alert('Error', 'Selecciona al menos un paso o escribe uno manual');
       return;
     }
 
-    onAdd(title.trim(), stepsToAdd);
+    const added = await onAdd(title.trim(), stepsToAdd);
+    if (!added) {
+      onRequirePremium();
+      handleClose();
+      return;
+    }
+
     resetForm();
     onClose();
   };
 
   const resetForm = () => {
     setTitle('');
-    setManualStep('');
+    setManualSteps([]);
     setAiSteps([]);
     setSelectedSteps(new Set());
   };
@@ -295,10 +311,10 @@ export function AddTaskModal({ visible, onClose, onAdd }: AddTaskModalProps) {
             {loadingAI ? (
               <ActivityIndicator color={colors.accent} size="small" />
             ) : (
-              <Ionicons name="sparkles" size={20} color={colors.accent} />
+              <Ionicons name={isPremium ? 'sparkles' : 'lock-closed'} size={20} color={colors.accent} />
             )}
             <Text style={styles.aiButtonText}>
-              {loadingAI ? 'Generando...' : 'Generar pasos con IA'}
+              {loadingAI ? 'Generando...' : (isPremium ? 'Generar pasos con IA' : 'Desbloquear con IA')}
             </Text>
           </TouchableOpacity>
 
@@ -336,16 +352,45 @@ export function AddTaskModal({ visible, onClose, onAdd }: AddTaskModalProps) {
             </View>
           )}
 
-          {/* Paso manual */}
+          {/* Pasos manuales */}
           <View style={styles.manualStepContainer}>
-            <Text style={styles.manualStepTitle}>O agrega un paso manual:</Text>
-            <TextInput
-              style={styles.input}
-              placeholder="Escribe un paso adicional..."
-              placeholderTextColor={colors.textMuted}
-              value={manualStep}
-              onChangeText={setManualStep}
-            />
+            <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: SPACING.sm }}>
+              <Text style={styles.manualStepTitle}>Pasos manuales ({manualSteps.length}):</Text>
+              <TouchableOpacity
+                style={{ flexDirection: 'row', alignItems: 'center', gap: 4, padding: SPACING.xs }}
+                onPress={() => setManualSteps([...manualSteps, { title: '', description: '' }])}
+              >
+                <Ionicons name="add" size={18} color={colors.accent} />
+                <Text style={{ color: colors.accent, fontSize: FONTS.size.small, fontWeight: FONTS.weight.semibold }}>Agregar paso</Text>
+              </TouchableOpacity>
+            </View>
+            {manualSteps.map((step, index) => (
+              <View key={index} style={{ flexDirection: 'row', gap: SPACING.sm, marginBottom: SPACING.sm, alignItems: 'flex-start' }}>
+                <TextInput
+                  style={[styles.input, { flex: 1 }]}
+                  placeholder={`Paso ${index + 1}...`}
+                  placeholderTextColor={colors.textMuted}
+                  value={step.title}
+                  onChangeText={text => setManualSteps(prev => prev.map((s, i) => i === index ? { ...s, title: text } : s))}
+                  autoFocus={index === 0 && manualSteps.length === 1}
+                />
+                <TouchableOpacity
+                  style={{ padding: SPACING.xs, minWidth: 44, minHeight: 44, justifyContent: 'center', alignItems: 'center' }}
+                  onPress={() => setManualSteps(prev => prev.filter((_, i) => i !== index))}
+                >
+                  <Ionicons name="trash" size={20} color={colors.error} />
+                </TouchableOpacity>
+              </View>
+            ))}
+            {manualSteps.length === 0 && (
+              <TouchableOpacity
+                style={{ flexDirection: 'row', alignItems: 'center', gap: 4, padding: SPACING.xs, marginTop: SPACING.xs }}
+                onPress={() => setManualSteps([{ title: '', description: '' }])}
+              >
+                <Ionicons name="add" size={18} color={colors.accent} />
+                <Text style={{ color: colors.accent, fontSize: FONTS.size.small, fontWeight: FONTS.weight.semibold }}>Agregar primer paso</Text>
+              </TouchableOpacity>
+            )}
           </View>
 
           <View style={styles.buttons}>
@@ -355,10 +400,10 @@ export function AddTaskModal({ visible, onClose, onAdd }: AddTaskModalProps) {
             <TouchableOpacity
               style={[
                 styles.buttonAdd,
-                (selectedSteps.size === 0 && !manualStep.trim()) && styles.buttonAddDisabled
+                (selectedSteps.size === 0 && manualSteps.every(s => !s.title.trim())) && styles.buttonAddDisabled
               ]}
               onPress={handleAdd}
-              disabled={selectedSteps.size === 0 && !manualStep.trim()}
+              disabled={selectedSteps.size === 0 && manualSteps.every(s => !s.title.trim())}
             >
               <Ionicons name="add-circle" size={20} color={colors.textPrimary} />
               <Text style={styles.buttonAddText}>Agregar</Text>
